@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+.broken {
+  background-color: red;
+}
+
+.prop {
+  font-weight: 200;
+  font-size: large;
+}
+
