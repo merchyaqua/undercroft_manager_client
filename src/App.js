@@ -7,7 +7,7 @@ import PropDetailsPage from "./PropsDetailPage";
 import PropAddPage from "./PropsAddPage";
 import ProductionsPage from "./ProductionsPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {PropsListPage} from "./PropsListPage";
 import { ProductionPropsListsPage } from "./ProductionPropsListsPage";
 function App() {
@@ -20,8 +20,9 @@ function App() {
           <Route path="add-prop" element={<PropAddPage/>} />
 {/* https://hygraph.com/blog/routing-in-react#how-to-implement-dynamic-routing-with-react-router */}
           <Route path="productions" element={<ProductionsPage />} />
-          <Route path="productions/*" element={<ProductionPropsListsPage/>} />
-          <Route path="props-list/*" element={<PropsListPage />} />
+          {/* <Route path="production/:productionID*" element={<ProductionDetailPage/>} /> would be production details page*/} 
+          <Route path="production/:productionID/props-lists/" element={<ProductionPropsListsPage />} />
+          <Route path="props-list/:propsListID" element={<PropsListPage />} />
 
           <Route path="*" element={<NoMatch />} />
         </Route>

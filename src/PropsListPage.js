@@ -10,21 +10,42 @@ const samplePropsList = [
     description: "...he swung his sword at the guard",
     sourcestatus: "waiting",
     action: "Buy from Amazon",
+    propslistitemid: 2,
   },
   {
     name: "2x Sword",
     description: "...he swung his sword at the guard",
     sourcestatus: "waiting",
     action: "Buy from Amazon",
+    propslistitemid: 22,
   },
 ];
 
-export  function PropsListPage() {
-  const propsListID = useParams()["props-list-id"];
-  const [propsListItems, setPropsListItems] = useState(samplePropsList);
-  useEffect(()=>fetchItems("/props-lists/"+propsListID, setPropsListItems), []);
+export function PropsListPage() {
+  const propsListID = useParams()["propsListID"];
+  const [submitted, setSubmitted] = useState(false)
+
+
+  const [propsListContent, setPropsListContent] = useState({productionTitle: "Me", propsListTitle: "hi", propsListItems: samplePropsList});
+  useEffect(() => {
+    // Load propslistitems on first load of page, then whenever submitted is changed, reloads again.
+    console.log("fetched")
+    fetchItems("props-list/" + propsListID, setPropsListContent);
+
+  }, [submitted]);
   return (
-    // https://www.geeksforgeeks.org/how-to-create-a-table-in-reactjs/
-    <DataTable data={propsListItems} />
+    <>
+      // https://www.geeksforgeeks.org/how-to-create-a-table-in-reactjs/
+      {/* {propsListContent.propsListItems} */}
+      <DataTable
+        title={
+          propsListContent.propsListTitle +
+          " for " +
+          propsListContent.productionTitle
+        }
+        data={propsListContent.propsListItems}
+        setSubmitted={setSubmitted}
+      />
+    </>
   );
 }

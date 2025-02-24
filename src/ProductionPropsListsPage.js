@@ -1,9 +1,9 @@
 
-import { fetchItems } from "./fetchItems";
+import { fetchItems, handleFormSubmit } from "./fetchItems";
 import DataTable from "./Table";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { List, ListItem, ListItemButton } from "@mui/material";
+import { Box, List, ListItem, ListItemButton, Button, TextField } from "@mui/material";
 const tryurl = "127.0.0.0:5000";
     
 export  function ProductionPropsListsPage() {
@@ -16,20 +16,31 @@ export  function ProductionPropsListsPage() {
             propsListID: 122,
           },
     ];
-    const productionID = useParams()["production-id"];
-    const [propsLists, setPropsLists] = useState(samplePropsLists);
+    const productionID = useParams()["productionID"];
+    const [productionTitle, setProductionTitle] = useState('')
+    useEffect(()=>fetchItems(`production/${productionID}`, (p)=>setProductionTitle(p.title)), []);
+
+    const [propsLists, setPropsLists] = useState([{productionTitle: "Loading"}]);
     const navigate = useNavigate();
-    useEffect(()=>fetchItems(`/production/${productionID}/props-list/`, setPropsLists), []);
+    const [adding, setAdding] = useState(false);
+
+    useEffect(()=>fetchItems(`production/${productionID}/props-list`, setPropsLists), []);
     return (
       <>
+      <h2>Props Lists for {productionTitle}</h2>
         Rushing so I can beat the line, but what if all I want is conversation and
         time?
+            <Button variant="outlined" onClick={() => setAdding(!adding)}>
+              {!adding ? "+ Add new props list" : "- Close"}
+            </Button>
+              {adding && <PropsListForm productionID={productionID} />}
+        
         <List>
-          {samplePropsLists.map((propsListDetails) =>
-            {const id = propsListDetails.propsListID
+          {propsLists.map((propsListDetails) =>
+            {const id = propsListDetails.propslistid
             return <Link to={"/props-list/"+id}>
               <ListItemButton key={id}>
-                {propsListDetails.title}
+                {propsListDetails.propslisttitle}
               </ListItemButton>
             </Link>}
           )}
@@ -38,3 +49,33 @@ export  function ProductionPropsListsPage() {
     );
   }
   
+
+
+  
+
+function PropsListForm({productionID}) {
+  const [formData, setFormData] = useState({
+    // isCostumeList: false,
+  });
+  function handleChange(e) { // check im giving creds to this code
+    const name = e.target.name;
+    const value = e.target.value;
+    setFormData((values) => ({ ...values, [name]: value }));
+  }
+  
+  return (
+    <Box centered display="inline-flex">
+
+        <TextField
+          name="title"
+          label="Props List Title"
+          value={formData.title || ""}
+          required
+          onChange={(e) => handleChange(e)}
+          />
+        <Button onClick={(e) => handleFormSubmit(e, `production/${productionID}/props-list`, formData)} variant="contained">
+          Submit
+        </Button>
+      </Box>
+  );
+}

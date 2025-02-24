@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchItems } from "./fetchItems";
+import { fetchItems, handleFormSubmit } from "./fetchItems";
 // import sampleProps from "./App"
 import { useNavigate } from "react-router-dom";
 // import { dayjs } from "dayjs";
@@ -38,8 +38,8 @@ export default function ProductionsPage({}) {
   const [adding, setAdding] = useState(false);
 
   const [productions, setProductions] = useState(sampleProductions);
-  useEffect(() => fetchItems("productions", setProductions), []);
-  console.log(productions);
+  useEffect(() => fetchItems("production", setProductions), []);
+  // console.log(productions);
 
   return (
     <div sx={{ margin: "5%" }}>
@@ -73,15 +73,16 @@ function Production({ data, navigate }) {
     productionid: id,
     isarchived: isarchived,
   } = data;
-  console.log(firstShowDate);
+  // console.log(firstShowDate);
   return (
     <ImageListItem
+    onClick={() => navigate("/production/" + id+"/props-lists")}
+
       className={"production" + (isarchived === "true" && " archived")}
     >
       <img
         src={imgsrc}
         alt={name}
-        onClick={() => navigate("/productions/" + id)}
       />
       <ImageListItemBar
         className="production"
@@ -89,8 +90,8 @@ function Production({ data, navigate }) {
         subtitle={
           <>
             <span>
-              Show dates: {firstShowDate.toDateString()} -{" "}
-              {lastShowDate.toDateString()}
+              Show dates: {dayjs(firstShowDate).format('DD/MM/YYYY')} -
+              {dayjs(lastShowDate).format('DD/MM/YYYY')}
             </span>
           </>
         }
@@ -104,30 +105,9 @@ function ProductionForm() {
   const [formData, setFormData] = useState({
     firstShowDate: dayjs(),
     lastShowDate: dayjs(),
+    photoPath: ''
   });
-  function handleChange(e) { // check im giving creds to this code
-    console.log(e)
-    const name = e.target.name;
-    const value = e.target.value;
-    setFormData((values) => ({ ...values, [name]: value }));
-    console.log(formData);
-  }
-  function handleSubmit(e) {
-    // not refactoring this yet becasuse iwant more control
-    console.log(JSON.stringify(formData));
-    async function submitData() {
-      const res = await fetch(tryurl + "production", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      redirect("production/" + data.productionid);
-    }
-    submitData();
-  }
+  
   return (
     <Box centered display="inline-flex">
 
@@ -137,6 +117,7 @@ function ProductionForm() {
           name="title"
           label="Production Name"
           value={formData.title || ""}
+          required
           onChange={(e) => handleChange(e)}
           />
         <DatePicker
@@ -152,7 +133,8 @@ function ProductionForm() {
           onChange={(e) => setFormData({...formData, lastShowDate: e})}
           
           />
-        <Button onClick={(e) => handleSubmit(e)} variant="contained">
+          {/* Ensure a correct format of dates is submitted */}
+        <Button onClick={(e) => handleFormSubmit(e, "production", {...formData, firstShowDate: formData.firstShowDate.toISOString(), lastShowDate: formData.lastShowDate.toISOString()})} variant="contained">
           Submit
         </Button>
       {/* </FormControl> */}

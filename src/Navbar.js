@@ -1,9 +1,10 @@
 import { useNavigate,Outlet, Link, NavLink} from "react-router-dom";
-import {Button, AppBar, Toolbar, Typography, ListItem, ButtonGroup, ListItemButton} from "@mui/material";
+import {Button, AppBar, Toolbar, Typography, ListItem, ButtonGroup, ListItemButton, Box} from "@mui/material";
 export default function Navbar(){
     const n = useNavigate();
     return (
-        <><AppBar sx={{ marginBottom: "30px" }} position="static">
+        <>
+        <AppBar sx={{ marginBottom: "30px", backgroundColor: "darkgoldenrod" }} position="static">
         <Toolbar>
             <Typography>Undercroft Manager</Typography>
           
@@ -18,9 +19,12 @@ export default function Navbar(){
             sx={{'text-align': 'right'}}>⬅️Back</Button>
                     </Toolbar>
                   </AppBar>
+        <Box sx={{padding: "20px"}}>
+        
         <Outlet/>
-        </>
+        </Box>
 
+            </>
     )
 }
 

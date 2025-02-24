@@ -26,7 +26,8 @@ import {
   NativeSelect,
 } from "@mui/material";
 import { redirect } from "react-router-dom";
-import { fetchItems } from "./fetchItems";
+import { fetchItems, handleFormSubmit, submitData } from "./fetchItems";
+import { checkFormRequiredFilled } from "./helpers";
 const tryurl = "http://127.0.0.1:5000/";
 
 const sampleProps = [
@@ -61,47 +62,75 @@ export default function PropAddPage({}) {
     >
       <Typography variant="h2">Add a prop!</Typography>
 
-      <Box></Box>
       <Details categoryItems={sampleCategories} />
     </>
   );
 }
 
 function Details() {
-  const [formData, setFormData] = useState({});
+  const defaultFormData = { isBroken: "off", name: "", description: "" };
+  const requiredFields = ["name", "categoryID", "locationID"];
+  const [formData, setFormData] = useState(defaultFormData);
+  const [canSubmit, setCanSubmit] = useState(false);
+  // check all values exist
+  useEffect(() => {
+    // No submitting while adding
+    if (formData.locationID === "add" || formData.categoryID === "add") {
+      setCanSubmit(false);
+    } else{
+      setCanSubmit(checkFormRequiredFilled(requiredFields, formData))
+    }
+    
+  }, [formData]);
   // Fetch a list of locations and categories as options
-  const [locationItems, setLocationItems] = useState(sampleLocations);
-  const [categoryItems, setCategoryItems] = useState(sampleCategories);
-  // A general function to fetch results to avoid code repetition.
 
-  useEffect(() => fetchItems("location", setLocationItems), []);
-  useEffect(() => fetchItems("category", setCategoryItems), []);
   // instead of using the fetched results, we want the most up-to-date categories.
   function handleChange(e) {
     const name = e.target.name;
     const value = e.target.value;
+    // handle add new for location and category
     setFormData((values) => ({ ...values, [name]: value }));
   }
   function handleSubmit(e, noReload) {
-    console.log("ere");
-    console.log(JSON.stringify(formData));
-    async function submitData() {
-      const res = await fetch(tryurl + "prop", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      console.log(data.propID);
-      redirect("prop/" + data.propID);
-    }
-    submitData();
+    const receivedData = handleFormSubmit(e, "prop", formData);
     if (!noReload) {
       setFormData({});
     } // Don't reload when save details
   }
+
+  const [locationOptions, setLocationOptions] = useState([
+    { name: "Loading...", locationid: null },
+  ]);
+
+  const [categoryOptions, setCategoryOptions] = useState([
+    { name: "Loading...", categoryid: null },
+  ]);
+  // Fetch options, append the add new option to the end.
+  useEffect(() => {
+    fetchItems("location", (o) => {
+      setLocationOptions([...o, { name: "+ Add New", locationid: "add" }]);
+    });
+  }, []);
+  useEffect(() => {
+    fetchItems("category", (o) => {
+      setCategoryOptions([...o, { name: "+ Add New", categoryid: "add" }]);
+    });
+  }, []);
+  // Ensure that once there is a change - whether a fetch or and add, the default value is set to the first
+  useEffect(
+    () =>
+      setFormData((values) => ({
+        ...values,
+        locationID: locationOptions[0].locationid,
+      })),
+    [locationOptions]
+  );
+  useEffect(() => {
+    setFormData((values) => ({
+      ...values,
+      categoryID: categoryOptions[0].categoryid,
+    }));
+  }, [categoryOptions]);
 
   return (
     // https://stackoverflow.com/questions/65531477/how-to-post-form-data-using-material-ui-into-api
@@ -118,7 +147,7 @@ function Details() {
             control={
               <Checkbox
                 color="warning"
-                value={formData.isBroken}
+                value={formData.isBroken || "off"}
                 onChange={handleChange}
               />
             }
@@ -131,8 +160,11 @@ function Details() {
           <DropdownMenu
             label="Location"
             name="locationID"
-            options={locationItems}
+            fetchResource="location"
             value={formData.locationID}
+            options={locationOptions}
+            setOptions={setLocationOptions}
+            setValue={(val) => setFormData({ ...formData, locationID: val })}
             onChange={handleChange}
           />
 
@@ -146,17 +178,27 @@ function Details() {
           <DropdownMenu
             label={"Category"}
             name="categoryID"
-            options={categoryItems}
             value={formData.categoryID}
+            options={categoryOptions}
+            setOptions={setCategoryOptions}
+            setValue={(val) => setFormData({ ...formData, categoryID: val })}
             onChange={handleChange}
           />
         </FormGroup>
         <span>
           {/* All buttons will submit the data to the server. The third one resets the whole page. The second one will simply submit the data and do nothing.*/}
-          <Button onClick={(e) => handleSubmit(e, true)} variant="contained">
+          <Button
+            disabled={!canSubmit}
+            onClick={(e) => handleSubmit(e, true)}
+            variant="contained"
+          >
             Keep adding but save details for next add
           </Button>
-          <Button onClick={(e) => handleSubmit(e, false)} variant="contained">
+          <Button
+            disabled={!canSubmit}
+            onClick={(e) => handleSubmit(e, false)}
+            variant="contained"
+          >
             Keep adding without saving details for next add
           </Button>
         </span>
@@ -165,21 +207,38 @@ function Details() {
   );
 }
 
-function DropdownMenu({ label, name, options, onChange, value }) {
-  function handleAddNew() {
-    // an optional function
-    // make a request to the database to add it,
-    // get the ID to retrieve the new list of categories
-    // Make sure that the selected value in the dropdown is what had been just entered.
-  }
+function DropdownMenu({
+  label,
+  name,
+  onChange,
+  value,
+  setValue,
+  options,
+  setOptions,
+}) {
+  const isAddingNew = value === "add";
+
   return (
     <>
-      <InputLabel variant="standard" htmlFor="uncontrolled-native">
+      {isAddingNew && (
+        <DropdownAddNewForm
+          label={label}
+          items={options}
+          setItems={setOptions}
+          setValue={setValue}
+        />
+      )}
+
+      <InputLabel
+        variant="standard"
+        htmlFor="uncontrolled-native"
+        key={"label"}
+      >
         {label}
       </InputLabel>
       <NativeSelect
         onChange={onChange}
-        defaultValue={options[0].categoryid || options[0].locationid}
+        key={label}
         value={value}
         inputProps={{
           name: name,
@@ -187,16 +246,54 @@ function DropdownMenu({ label, name, options, onChange, value }) {
         }}
       >
         {/* uh oh the attributes - might have to end up returning categoryid as just id when being requested on its own */}
-        {options.map((categoryItem) => {
-          const id = categoryItem.categoryid || categoryItem.locationid;
+        {[...options].map((item) => {
+          const id = item.categoryid || item.locationid;
           return (
-            <option value={id} key={id}>
-              {categoryItem.name}
-            </option>
+            <>
+              <option value={id} key={id}>
+                {item.name}
+              </option>
+            </>
           );
         })}
-        <option onClick={handleAddNew}>+ Add new...</option>
       </NativeSelect>
     </>
+  );
+}
+
+function DropdownAddNewForm({
+  label,
+  handleAddNew,
+  items,
+  setItems,
+  setValue,
+}) {
+  const [name, setName] = useState("");
+  async function handleAddNew() {
+    async function handleSubmit() {
+      // sends data, gets id as a response
+      const data = await submitData(null, label.toLowerCase(), { name: name });
+      console.log(data);
+      return data;
+    }
+    const id = await handleSubmit();
+    // make a request to the database to add it,
+    // test without fetch assigning arbitrary id: const data = {locationid: 3}
+    // get the ID to retrieve the new list of categories/locations
+    const newItem = { name: name, [label.toLowerCase() + "id"]: id };
+    console.log(newItem);
+    // Make sure that the selected value in the dropdown is what had been just entered.
+    setItems([newItem, ...items]);
+    setValue(name);
+  }
+  return (
+    <Box centered display="inline-flex">
+      <TextField
+        label={"New " + label + "name:"}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <Button onClick={handleAddNew}>Submit</Button>
+    </Box>
   );
 }
