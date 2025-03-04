@@ -4,9 +4,7 @@ import DataTable from "./Table";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Box, List, ListItem, ListItemButton, Button, TextField } from "@mui/material";
-const tryurl = "127.0.0.0:5000";
     
-export  function ProductionPropsListsPage() {
     const samplePropsLists = [
         {
             title: "Set",
@@ -16,15 +14,18 @@ export  function ProductionPropsListsPage() {
             propsListID: 122,
           },
     ];
+export  function ProductionPropsListsPage() {
     const productionID = useParams()["productionID"];
     const [productionTitle, setProductionTitle] = useState('')
     useEffect(()=>fetchItems(`production/${productionID}`, (p)=>setProductionTitle(p.title)), []);
 
-    const [propsLists, setPropsLists] = useState([{productionTitle: "Loading"}]);
+    const [propsLists, setPropsLists] = useState([]);
     const navigate = useNavigate();
     const [adding, setAdding] = useState(false);
 
     useEffect(()=>fetchItems(`production/${productionID}/props-list`, setPropsLists), []);
+    
+  useEffect(()=>console.log(propsLists), [propsLists])
     return (
       <>
       <h2>Props Lists for {productionTitle}</h2>

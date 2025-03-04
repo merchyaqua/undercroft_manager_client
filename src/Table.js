@@ -1,9 +1,23 @@
-import {useEffect, useState} from "react";
-import {Button, Checkbox, InputLabel, Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField, ToggleButton, Typography} from '@mui/material'
-import { handleFormSubmit } from "./fetchItems";
+import { useEffect, useState } from "react";
+import {
+  Button,
+  Checkbox,
+  InputLabel,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+  ToggleButton,
+  Typography,
+} from "@mui/material";
+import { handleFormSubmit, handleItemEdit, submitData } from "./fetchItems";
+import { useNavigate } from "react-router-dom";
 
 // https://codesandbox.io/p/sandbox/material-ui-table-dynamic-wrod4?file=%2Fsrc%2Findex.js%3A10%2C7
-export function DataTable({ title, data, setSubmitted }) {
+export function DataTable({ title, data, setSubmitted, propsListID }) {
   // Extract headers and not include id as a field
   const sample = {
     name: "2x Sword",
@@ -11,13 +25,19 @@ export function DataTable({ title, data, setSubmitted }) {
     sourcestatus: "waiting",
     action: "Buy from Amazon",
     propslistitemid: 22,
+  };
+  const headers = Object.keys(sample).filter((s) => s !== "propslistitemid");
+  const initialNewRow ={
+    name: "",
+    description: "",
+    sourcestatus: "Todo",
+    action: "",
   }
-  const headers = Object.keys(sample).filter((s) => s !== 'propslistitemid');
-  
+  const [form, setForm] = useState(initialNewRow);
   return (
     <Paper>
       <Typography variant="h4" color="inherit">
-        {title}
+        {title} 
       </Typography>
 
       <hr />
@@ -26,18 +46,28 @@ export function DataTable({ title, data, setSubmitted }) {
         <TableHead>
           <TableRow>
             <TableCell></TableCell>
-            {headers.map(header => (
+            {headers.map((header) => (
               <TableCell align="right">{header.toUpperCase()}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          <PropsListTableRowForm setSubmitted={setSubmitted} headers={headers}></PropsListTableRowForm>
-
+          <PropsListTableRowForm
+            setSubmitted={setSubmitted}
+            emp={form}
+            setEditing={() => setForm(initialNewRow)} // empty function since the page would reload anyway and return to a fresh state
+            headers={headers}
+            add={true}
+            propsListID={propsListID}
+          />
 
           {data.map((emp, index) => (
-            <PropsListTableRow emp={emp} headers={headers} key={index}/>
-            
+            <PropsListTableRow
+              emp={emp}
+              headers={headers}
+              key={index}
+              setSubmitted={setSubmitted}
+            />
           ))}
         </TableBody>
       </Table>
@@ -45,39 +75,106 @@ export function DataTable({ title, data, setSubmitted }) {
   );
 }
 
-function PropsListTableRow({emp, headers}){
-  const [propDone, setPropDone] = useState(false);
-  function handleItemToggleDone(){
-    // post request that sends stuff using porpslistitemid for a partial update
+function PropsListTableRow({ emp, headers, setSubmitted }) {
+  // emp here is the props list item gObject with key-value pairs.
+
+
+  const [editing, setEditing] = useState(false);
+  const navigate = useNavigate();
+  const done = emp.sourcestatus === "Done";
+  const [propDone, setPropDone] = useState(done);
+  useEffect(() => setPropDone( emp.sourcestatus === "Done"), [emp])
+  useEffect(() => setSubmitted(false)); // on getting the component mounted, set not submitted
+
+  function handleEditButtonClicked() {
+    setEditing(true);
   }
-  useEffect(handleItemToggleDone, [propDone]);
+  function handleToggleDone(e) {
+    // Action is set to 'Done' and submitted to the PUT method.
+    // setPropDone(!propDone);
+    
+    const newData = { ...emp, sourceStatus: !propDone ? "Done" : "Todo" };
+    submitData("props-list-item/" + emp.propslistitemid, newData, "PUT");
+    setSubmitted(true);
+  }
+  function handleDeleteItem(e) {
+    submitData("props-list-item/" + emp.propslistitemid, null, "DELETE");
+    setSubmitted(true);
+
+  }
+  function handleViewLinkedProp(e) {
+    // Access the linked propID in the emp
+    const propID = emp.propID;
+    // Redirect to corresponding prop page
+    navigate("/prop/" + propID);
+  }
   return (
-    <TableRow key={emp.propslistitemid}  sx={ propDone && {backgroundColor: '#efffef'}}>
-      <TableCell >
-        <InputLabel>Done</InputLabel>
-        <Checkbox color="success" value={propDone} onChange={() => setPropDone(!propDone)}></Checkbox>
-        <ToggleButton sx={{"background-color":"Beige"}}>✏️</ToggleButton>
-        <ToggleButton >❌</ToggleButton>
-        <Button variant="outlined" sx={{width: 0}}>View Linked prop</Button>
-      </TableCell>
-      {headers.map(header => (
-        <TableCell align="right" key={header}>{emp[header]}</TableCell>
-      ))}
-    </TableRow>
-  )
+    <>
+      {editing ? (
+        <PropsListTableRowForm
+          emp={emp}
+          headers={headers}
+          add={false}
+          setEditing={setEditing}
+          setSubmitted={setSubmitted}
+        />
+      ) : (
+        <TableRow
+          key={emp.propslistitemid}
+          sx={propDone && { backgroundColor: "#efffef" }}
+        >
+          <TableCell>
+            <InputLabel>Done</InputLabel>
+            <Checkbox
+              color="success"
+              value={propDone}
+              checked={propDone}
+              onChange={handleToggleDone}
+            />
+            <ToggleButton
+              sx={{ "background-color": "Beige" }}
+              onClick={handleEditButtonClicked}
+            >
+              ✏️
+            </ToggleButton>
+            <ToggleButton onClick={handleDeleteItem}>❌</ToggleButton>
+            {}
+            <Button
+              variant="outlined"
+              sx={{ width: 0 }}
+              onClick={handleViewLinkedProp}
+            >
+              View Linked prop
+            </Button>
+          </TableCell>
+          {headers.map((header) => (
+            <TableCell align="right" key={header}>
+              {emp[header]}
+            </TableCell>
+          ))}
+        </TableRow>
+      )}
+    </>
+  );
 }
 
 DataTable.defaultProps = {
-  title: "No Title"
+  title: "No Title",
 };
 
+function PropsListTableRowForm({
+  emp,
+  headers,
+  setSubmitted,
+  setEditing,
+  add,
+  propsListID,
+}) {
+  const initialData = { ...emp, sourceStatus: emp.sourcestatus };
+  const [formData, setFormData] = useState(initialData);
+  const canSubmit = formData.name !== "";
+  const propDone = formData.status === "Done"; //propDone is derived from formData.
 
-function PropsListTableRowForm({emp, headers, setSubmitted}){
-  const [propDone, setPropDone] = useState(false);
-  const [formData, setFormData] = useState({name: ''})
-  const canAdd = formData.name !== '';
-  
-  
   function handleChange(e) {
     const name = e.target.name;
     const value = e.target.value;
@@ -85,27 +182,46 @@ function PropsListTableRowForm({emp, headers, setSubmitted}){
     setFormData((values) => ({ ...values, [name]: value }));
   }
 
-  function handleItemToggleDone(){
-    // post request that sends stuff using porpslistitemid for a partial update
+  function handleSubmit(e) {
+    console.log("submit");
+    if (add) {
+      const res = handleFormSubmit(e, "props-list/" + propsListID, formData);
+    } else {
+      const res = submitData(
+        "props-list-item/" + formData.propslistitemid,
+        formData,
+        "PUT"
+      );
+    }
+    // It should fetch first and wait for a return code before disappearing it.
+
+    setSubmitted(true); // submitted would mean a reload needed
+    setEditing(false);
+
+    // console.log("submit changed to true")
   }
-  function handleAddPropsListItem(e){
-    handleFormSubmit(e, 'props-list', formData)
-    setSubmitted(true);
-    console.log("submit changed to true")
-  }
-  useEffect(handleItemToggleDone, [propDone]);
   return (
-    <TableRow key={emp}  sx={ propDone && {backgroundColor: '#efffef'}}>
-      <TableCell >
-       <Button onClick={handleAddPropsListItem} disabled={!canAdd}>+ ADD</Button>
+    <TableRow key={emp} sx={propDone && { backgroundColor: "#efffef" }}>
+      <TableCell>
+        <Button onClick={handleSubmit} disabled={!canSubmit}>
+          {add ? "+ ADD" : "SAVE"}
+        </Button>
+        <Button onClick={() => {
+         setFormData(initialData)
+          setEditing(false)
+          }}>CANCEL</Button>
       </TableCell>
-      {headers.map(header => (
+      {headers.map((header) => (
         <TableCell align="right" key={header}>
-          <TextField value={formData[header]|| ''} name={header} onChange={handleChange}></TextField>
+          <TextField
+            value={formData[header] || ""}
+            name={header}
+            onChange={handleChange}
+          ></TextField>
         </TableCell>
       ))}
     </TableRow>
-  )
+  );
 }
 
 export default DataTable;

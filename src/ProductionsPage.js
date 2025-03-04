@@ -43,7 +43,6 @@ export default function ProductionsPage({}) {
 
   return (
     <div sx={{ margin: "5%" }}>
-      {/* toggle */}
       <Button variant="outlined" onClick={() => setAdding(!adding)}>
         {!adding ? "+ Add new production" : "- Close"}
       </Button>
@@ -118,7 +117,7 @@ function ProductionForm() {
           label="Production Name"
           value={formData.title || ""}
           required
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => setFormData({...formData, title: e.target.value})}
           />
         <DatePicker
           label="First show date"

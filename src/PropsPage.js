@@ -19,12 +19,13 @@ import {
 import { Sidebar, SidebarItem } from "./Sidebar";
 import { sampleCategories, sampleProps, sampleTags } from "./testData";
 import { useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 const KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dXR5eWhycWhjeG1ieHVsdXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcwMjEzNzMsImV4cCI6MjA1MjU5NzM3M30.Gd-9bO3KMEvcD-i5ug9Fr0SRvs_hkwvk1X-3yuoq4Vg";
 const DBURL = `https://otutyyhrqhcxmbxuluvv.supabase.co/rest/v1/prop?apikey=${KEY}`;
 const testing = false;
 
-export default function Main({ setPage }) {
+export default function Main() {
 
     const [categoryID, setCategoryID] = useState("");
     const [propResults, setPropResults] = useState(sampleProps);
@@ -75,7 +76,7 @@ export default function Main({ setPage }) {
     return (
       <>
         <Box
-          sx={{ flexGrow: 1, ml: '20px', position: 'relative'}}
+          sx={{ display:'flex', ml: '20px', position: 'absolute', height:"100%"}}
           component="main"
         >
           
@@ -84,7 +85,7 @@ export default function Main({ setPage }) {
           selectedCategoryID={categoryID}
         />
       <Box
-          sx={{ flexGrow: 1, ml: `100px`, position: 'relative'}}
+          sx={{ flexGrow: 1, ml: `200px`, position: 'relative'}}
           component="main"
         >
 
@@ -92,19 +93,15 @@ export default function Main({ setPage }) {
             id="query"
             sx={{ width: "500px" }}
             onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search for a prop"
             />
-          <Button>Search!</Button>
+          {/* <Button>Search!</Button> */}
   
-          <Typography>HOPE YOU'RE HAVING A GREAT DAY</Typography>
           <TagsInput tagsData={sampleTags} />
           <Divider />
           {/* As part of mental health week, I am noticing the ease of writing JSX that I normally take for granted. Imagine how the developers worked to parse complex nested syntax! */}
-          {error && <Typography variant="primary">{error}</Typography>}
-          {loading && <Typography>Loading...</Typography>}
+          <Loader error={error} loading={loading}><PropResults propResults={propResults} /></Loader>
   
-          {!error && !loading && (
-            <PropResults propResults={propResults} />
-          )}
           </Box>
         </Box>
       </>

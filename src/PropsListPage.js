@@ -23,6 +23,7 @@ const samplePropsList = [
 
 export function PropsListPage() {
   const propsListID = useParams()["propsListID"];
+  // The data is re-fetched once something gets submitted.
   const [submitted, setSubmitted] = useState(false)
 
 
@@ -45,6 +46,7 @@ export function PropsListPage() {
         }
         data={propsListContent.propsListItems}
         setSubmitted={setSubmitted}
+        propsListID={propsListID}
       />
     </>
   );

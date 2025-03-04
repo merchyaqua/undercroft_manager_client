@@ -28,6 +28,7 @@ import {
 import { redirect } from "react-router-dom";
 import { fetchItems, handleFormSubmit, submitData } from "./fetchItems";
 import { checkFormRequiredFilled } from "./helpers";
+import FileUpload from "./FileUpload";
 const tryurl = "http://127.0.0.1:5000/";
 
 const sampleProps = [
@@ -62,13 +63,14 @@ export default function PropAddPage({}) {
     >
       <Typography variant="h2">Add a prop!</Typography>
 
-      <Details categoryItems={sampleCategories} />
+      <DetailsForm categoryItems={sampleCategories} />
     </>
   );
 }
 
-function Details() {
-  const defaultFormData = { isBroken: "off", name: "", description: "" };
+export function DetailsForm({
+  defaultFormData = { isBroken: "off", name: "", description: "" },
+}) {
   const requiredFields = ["name", "categoryID", "locationID"];
   const [formData, setFormData] = useState(defaultFormData);
   const [canSubmit, setCanSubmit] = useState(false);
@@ -77,10 +79,9 @@ function Details() {
     // No submitting while adding
     if (formData.locationID === "add" || formData.categoryID === "add") {
       setCanSubmit(false);
-    } else{
-      setCanSubmit(checkFormRequiredFilled(requiredFields, formData))
+    } else {
+      setCanSubmit(checkFormRequiredFilled(requiredFields, formData));
     }
-    
   }, [formData]);
   // Fetch a list of locations and categories as options
 
@@ -137,6 +138,7 @@ function Details() {
     <Box sx={{ display: "inline-block" }}>
       <form>
         <FormGroup>
+          <FileUpload/>
           <TextField
             name="name"
             label="Prop name"
