@@ -102,23 +102,20 @@ export function DetailsForm({
     setFormData((values) => ({ ...values, [name]: value }));
   }
   async function handleSubmit(e, noReload) {
+    let photoPath = null;
     if (image) {
       // Directly upload to imgur and get a link.
-      console.log("Hid");
-      const photoPath = await uploadToImgur(image, "idk", formData.name);
-      console.log(photoPath);
-      setFormData({ ...formData, photoPath: photoPath });
-      console.log(formData);
-    } else {
-      setFormData({ ...formData, photoPath: "" });
+      console.log("Uploading to imgur");
+      photoPath = await uploadToImgur(image, "idk", formData.name);
+      console.log("Uploaded to imgur");
     }
-    const receivedData = await handleFormSubmit(e, "prop", formData);
+    const receivedData = await handleFormSubmit(e, "prop", { ...formData, photoPath: photoPath });
     console.log(receivedData)
     if (!noReload) {
-      setFormData({});
-    // Don't reload when save details
+      // Don't reload when save details
       const propID = receivedData.propid
       navigate("/prop/"+propID)
+      // setFormData({});
     }
   }
 
