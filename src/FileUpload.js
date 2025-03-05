@@ -2,6 +2,7 @@ import {useState}  from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import uploadToImgur from './ImgurAPI';
 
 
 // https://mui.com/material-ui/react-button/
@@ -33,7 +34,8 @@ export default function FileUpload({setFile}) {
     >
       Upload files
       <VisuallyHiddenInput
-        type='image'
+        type='file'
+        accept="image/*"
         onChange={(event) => {setFile(event.target.files[0]); setUrl(URL.createObjectURL(event.target.files[0]))}}
 
         />

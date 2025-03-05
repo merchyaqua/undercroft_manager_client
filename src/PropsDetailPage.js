@@ -82,7 +82,7 @@ export default function PropDetailsPage() {
       <Box sx={{display:"grid"}}>
         <Box >
           <Box sx={{ display: "inline-block", width: "50%" }}>
-            <img src={propItem.photopath} sx={{  width: "100%"  }} />
+            <img src={propItem.photopath} sx={{  maxWidth: "100%"  }} />
             <Button variant="contained" sx={{ width: "100%" }}>
               View use history
             </Button>

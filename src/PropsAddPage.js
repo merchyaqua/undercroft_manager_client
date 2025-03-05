@@ -25,10 +25,11 @@ import {
   ToggleButton,
   NativeSelect,
 } from "@mui/material";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import { fetchItems, handleFormSubmit, submitData } from "./fetchItems";
 import { checkFormRequiredFilled } from "./helpers";
 import FileUpload from "./FileUpload";
+import uploadToImgur from "./ImgurAPI";
 const tryurl = "http://127.0.0.1:5000/";
 
 const sampleProps = [
@@ -69,11 +70,19 @@ export default function PropAddPage({}) {
 }
 
 export function DetailsForm({
-  defaultFormData = { isBroken: "off", name: "", description: "" },
+  defaultFormData = {
+    isBroken: "off",
+    name: "",
+    description: "",
+    photoPath: null,
+  },
 }) {
   const requiredFields = ["name", "categoryID", "locationID"];
   const [formData, setFormData] = useState(defaultFormData);
+  const [image, setImage] = useState(null);
   const [canSubmit, setCanSubmit] = useState(false);
+  const navigate = useNavigate();
+
   // check all values exist
   useEffect(() => {
     // No submitting while adding
@@ -92,11 +101,25 @@ export function DetailsForm({
     // handle add new for location and category
     setFormData((values) => ({ ...values, [name]: value }));
   }
-  function handleSubmit(e, noReload) {
-    const receivedData = handleFormSubmit(e, "prop", formData);
+  async function handleSubmit(e, noReload) {
+    if (image) {
+      // Directly upload to imgur and get a link.
+      console.log("Hid");
+      const photoPath = await uploadToImgur(image, "idk", formData.name);
+      console.log(photoPath);
+      setFormData({ ...formData, photoPath: photoPath });
+      console.log(formData);
+    } else {
+      setFormData({ ...formData, photoPath: "" });
+    }
+    const receivedData = await handleFormSubmit(e, "prop", formData);
+    console.log(receivedData)
     if (!noReload) {
       setFormData({});
-    } // Don't reload when save details
+    // Don't reload when save details
+      const propID = receivedData.propid
+      navigate("/prop/"+propID)
+    }
   }
 
   const [locationOptions, setLocationOptions] = useState([
@@ -117,6 +140,7 @@ export function DetailsForm({
       setCategoryOptions([...o, { name: "+ Add New", categoryid: "add" }]);
     });
   }, []);
+
   // Ensure that once there is a change - whether a fetch or and add, the default value is set to the first
   useEffect(
     () =>
@@ -138,7 +162,7 @@ export function DetailsForm({
     <Box sx={{ display: "inline-block" }}>
       <form>
         <FormGroup>
-          <FileUpload/>
+          <FileUpload setFile={setImage} />
           <TextField
             name="name"
             label="Prop name"
@@ -157,8 +181,6 @@ export function DetailsForm({
             name="isBroken"
             // UGHHHH
           />
-          {/* <ToggleButton value={false}> dafsa</ToggleButton> */}
-          {/* location needs to be a dropdown too */}
           <DropdownMenu
             label="Location"
             name="locationID"
@@ -169,14 +191,6 @@ export function DetailsForm({
             setValue={(val) => setFormData({ ...formData, locationID: val })}
             onChange={handleChange}
           />
-
-          <TextField
-            label="Description"
-            value={formData.description || ""}
-            onChange={handleChange}
-            name="description"
-          />
-          {/* Dropdown menu for categories */}
           <DropdownMenu
             label={"Category"}
             name="categoryID"
@@ -185,6 +199,12 @@ export function DetailsForm({
             setOptions={setCategoryOptions}
             setValue={(val) => setFormData({ ...formData, categoryID: val })}
             onChange={handleChange}
+          />
+          <TextField
+            label="Description"
+            value={formData.description || ""}
+            onChange={handleChange}
+            name="description"
           />
         </FormGroup>
         <span>
@@ -274,7 +294,7 @@ function DropdownAddNewForm({
   async function handleAddNew() {
     async function handleSubmit() {
       // sends data, gets id as a response
-      const data = await submitData(null, label.toLowerCase(), { name: name });
+      const data = await submitData(label.toLowerCase(), { name: name });
       console.log(data);
       return data;
     }
