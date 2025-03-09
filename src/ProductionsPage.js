@@ -3,32 +3,18 @@ import { fetchItems, handleFormSubmit } from "./fetchItems";
 // import sampleProps from "./App"
 import { useNavigate } from "react-router-dom";
 // import { dayjs } from "dayjs";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import {
-  FormControl,
-  InputLabel,
-  Input,
-  Checkbox,
-  FormHelperText,
   Box,
-  Divider,
   Button,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Typography,
-  TextField,
-  Autocomplete,
+  Divider,
   ImageList,
   ImageListItem,
   ImageListItemBar,
-  FormGroup,
-  FormControlLabel,
-  ToggleButton,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { sampleProductions } from "./testData";
 const dayjs = require("dayjs");
 const testing = true;
@@ -75,22 +61,18 @@ function Production({ data, navigate }) {
   // console.log(firstShowDate);
   return (
     <ImageListItem
-    onClick={() => navigate("/production/" + id+"/props-lists")}
-
+      onClick={() => navigate("/production/" + id + "/props-lists")}
       className={"production" + (isarchived === "true" && " archived")}
     >
-      <img
-        src={imgsrc}
-        alt={name}
-      />
+      <img src={imgsrc} alt={name} />
       <ImageListItemBar
         className="production"
         title={<Typography variant="h5">{name}</Typography>}
         subtitle={
           <>
             <span>
-              Show dates: {dayjs(firstShowDate).format('DD/MM/YYYY')} -
-              {dayjs(lastShowDate).format('DD/MM/YYYY')}
+              Show dates: {dayjs(firstShowDate).format("DD/MM/YYYY")} -
+              {dayjs(lastShowDate).format("DD/MM/YYYY")}
             </span>
           </>
         }
@@ -104,40 +86,47 @@ function ProductionForm() {
   const [formData, setFormData] = useState({
     firstShowDate: dayjs(),
     lastShowDate: dayjs(),
-    photoPath: ''
+    photoPath: "",
   });
-  
+
   return (
     <Box centered display="inline-flex">
-
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {/* <FormControl > */}
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        {/* <FormControl > */}
         <TextField
           name="title"
           label="Production Name"
           value={formData.title || ""}
           required
-          onChange={(e) => setFormData({...formData, title: e.target.value})}
-          />
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        />
         <DatePicker
           label="First show date"
           value={formData.firstShowDate}
-          onChange={(e) => setFormData({...formData, firstShowDate: e})}
-          />
+          onChange={(e) => setFormData({ ...formData, firstShowDate: e })}
+        />
         {/* COULD IMPROVE BY VALIDATION that first < last */}
         <DatePicker
           name="lastShowDate"
           label="Last show date"
           value={formData.lastShowDate}
-          onChange={(e) => setFormData({...formData, lastShowDate: e})}
-          
-          />
-          {/* Ensure a correct format of dates is submitted */}
-        <Button onClick={(e) => handleFormSubmit(e, "production", {...formData, firstShowDate: formData.firstShowDate.toISOString(), lastShowDate: formData.lastShowDate.toISOString()})} variant="contained">
+          onChange={(e) => setFormData({ ...formData, lastShowDate: e })}
+        />
+        {/* Ensure a correct format of dates is submitted */}
+        <Button
+          onClick={(e) =>
+            handleFormSubmit(e, "production", {
+              ...formData,
+              firstShowDate: formData.firstShowDate.toISOString(),
+              lastShowDate: formData.lastShowDate.toISOString(),
+            })
+          }
+          variant="contained"
+        >
           Submit
         </Button>
-      {/* </FormControl> */}
-    </LocalizationProvider>
-          </Box>
+        {/* </FormControl> */}
+      </LocalizationProvider>
+    </Box>
   );
 }

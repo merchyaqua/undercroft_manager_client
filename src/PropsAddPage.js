@@ -1,34 +1,20 @@
 import { useEffect, useState } from "react";
 // import sampleProps from "./App"
 import {
-  FormControl,
-  InputLabel,
-  Input,
-  Checkbox,
-  FormHelperText,
   Box,
-  Divider,
   Button,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Typography,
-  TextField,
-  Autocomplete,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  FormGroup,
+  Checkbox,
   FormControlLabel,
-  ToggleButton,
+  FormGroup,
+  InputLabel,
   NativeSelect,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import FileUpload from "./FileUpload";
 import { fetchItems, handleFormSubmit, submitData } from "./fetchItems";
 import { checkFormRequiredFilled } from "./helpers";
-import FileUpload from "./FileUpload";
 import uploadToImgur from "./ImgurAPI";
 const tryurl = "http://127.0.0.1:5000/";
 
@@ -109,12 +95,15 @@ export function DetailsForm({
       photoPath = await uploadToImgur(image, "idk", formData.name);
       console.log("Uploaded to imgur");
     }
-    const receivedData = await handleFormSubmit(e, "prop", { ...formData, photoPath: photoPath });
-    console.log(receivedData)
+    const receivedData = await handleFormSubmit(e, "prop", {
+      ...formData,
+      photoPath: photoPath,
+    });
+    console.log(receivedData);
     if (!noReload) {
       // Don't reload when save details
-      const propID = receivedData.propid
-      navigate("/prop/"+propID)
+      const propID = receivedData.propid;
+      navigate("/prop/" + propID);
       // setFormData({});
     }
   }

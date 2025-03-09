@@ -1,8 +1,7 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { fetchItems } from "./fetchItems";
 import DataTable from "./Table";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { List, ListItem, ListItemButton } from "@mui/material";
 const tryurl = "127.0.0.0:5000";
 const samplePropsList = [
   {
@@ -24,15 +23,17 @@ const samplePropsList = [
 export function PropsListPage() {
   const propsListID = useParams()["propsListID"];
   // The data is re-fetched once something gets submitted.
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(false);
 
-
-  const [propsListContent, setPropsListContent] = useState({productionTitle: "Me", propsListTitle: "hi", propsListItems: samplePropsList});
+  const [propsListContent, setPropsListContent] = useState({
+    productionTitle: "Me",
+    propsListTitle: "hi",
+    propsListItems: samplePropsList,
+  });
   useEffect(() => {
     // Load propslistitems on first load of page, then whenever submitted is changed, reloads again.
-    console.log("fetched")
+    console.log("fetched");
     fetchItems("props-list/" + propsListID, setPropsListContent);
-
   }, [submitted]);
   return (
     <>

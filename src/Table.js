@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -13,8 +12,9 @@ import {
   ToggleButton,
   Typography,
 } from "@mui/material";
-import { handleFormSubmit, handleItemEdit, submitData } from "./fetchItems";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { handleFormSubmit, submitData } from "./fetchItems";
 
 // https://codesandbox.io/p/sandbox/material-ui-table-dynamic-wrod4?file=%2Fsrc%2Findex.js%3A10%2C7
 export function DataTable({ title, data, setSubmitted, propsListID }) {
@@ -27,17 +27,17 @@ export function DataTable({ title, data, setSubmitted, propsListID }) {
     propslistitemid: 22,
   };
   const headers = Object.keys(sample).filter((s) => s !== "propslistitemid");
-  const initialNewRow ={
+  const initialNewRow = {
     name: "",
     description: "",
     sourcestatus: "Todo",
     action: "",
-  }
+  };
   const [form, setForm] = useState(initialNewRow);
   return (
     <Paper>
       <Typography variant="h4" color="inherit">
-        {title} 
+        {title}
       </Typography>
 
       <hr />
@@ -78,12 +78,11 @@ export function DataTable({ title, data, setSubmitted, propsListID }) {
 function PropsListTableRow({ emp, headers, setSubmitted }) {
   // emp here is the props list item gObject with key-value pairs.
 
-
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
   const done = emp.sourcestatus === "Done";
   const [propDone, setPropDone] = useState(done);
-  useEffect(() => setPropDone( emp.sourcestatus === "Done"), [emp])
+  useEffect(() => setPropDone(emp.sourcestatus === "Done"), [emp]);
   useEffect(() => setSubmitted(false)); // on getting the component mounted, set not submitted
 
   function handleEditButtonClicked() {
@@ -92,7 +91,7 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
   function handleToggleDone(e) {
     // Action is set to 'Done' and submitted to the PUT method.
     // setPropDone(!propDone);
-    
+
     const newData = { ...emp, sourceStatus: !propDone ? "Done" : "Todo" };
     submitData("props-list-item/" + emp.propslistitemid, newData, "PUT");
     setSubmitted(true);
@@ -100,7 +99,6 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
   function handleDeleteItem(e) {
     submitData("props-list-item/" + emp.propslistitemid, null, "DELETE");
     setSubmitted(true);
-
   }
   function handleViewLinkedProp(e) {
     // Access the linked propID in the emp
@@ -206,10 +204,14 @@ function PropsListTableRowForm({
         <Button onClick={handleSubmit} disabled={!canSubmit}>
           {add ? "+ ADD" : "SAVE"}
         </Button>
-        <Button onClick={() => {
-         setFormData(initialData)
-          setEditing(false)
-          }}>CANCEL</Button>
+        <Button
+          onClick={() => {
+            setFormData(initialData);
+            setEditing(false);
+          }}
+        >
+          CANCEL
+        </Button>
       </TableCell>
       {headers.map((header) => (
         <TableCell align="right" key={header}>

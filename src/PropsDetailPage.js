@@ -1,38 +1,17 @@
+import { Stack } from "@mui/material";
+import { RichTreeView } from "@mui/x-tree-view";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DetailsForm } from "./PropsAddPage";
 // import sampleProps from "./App"
 const tryurl = "http://127.0.0.1:5000/";
 
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Checkbox,
-  FormHelperText,
-  Box,
-  Divider,
-  Button,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Typography,
-  TextField,
-  Autocomplete,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  FormGroup,
-  FormControlLabel,
-  ToggleButton,
-} from "@mui/material";
-import { fetchItems } from "./fetchItems";
+import { Box, Button, Card, Typography } from "@mui/material";
+import { fetchItems, submitData } from "./fetchItems";
 
 const sampleProps = [
   {
-    name: "test",
+    propname: "test",
     photopath: "http://localhost:3000/logo192.png",
     locationname: "locname",
     locationid: "loc",
@@ -79,46 +58,46 @@ export default function PropDetailsPage() {
           ⭐Star
         </Button>
       </div>
-      <Box sx={{display:"grid"}}>
-        <Box >
+      <Box sx={{ display: "grid" }}>
+        <Box>
           <Box sx={{ display: "inline-block", width: "50%" }}>
-            <img src={propItem.photopath} sx={{  maxWidth: "100%"  }} />
+            <img src={propItem.photopath} style={{ maxWidth: "100%" }} />
             <Button variant="contained" sx={{ width: "100%" }}>
               View use history
             </Button>
           </Box>
-        {editing ? (
-          <>
-            <Button
-              variant="outlined"
-              color="warning"
-              sx={{ width: "1px" }}
-              onClick={() => setEditing(false)}
-            >
-              ❌
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ width: "10px" }}
-              onClick={handleSaveDetails}
+          {editing ? (
+            <>
+              <Button
+                variant="outlined"
+                color="warning"
+                sx={{ width: "1px" }}
+                onClick={() => setEditing(false)}
               >
-              Save
-            </Button>
-            <EditDetailsForm defaultFormData={propItem} />
-          </>
-        ) : (
-          <>
-            <Details propItem={propItem} />
+                ❌
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ width: "10px" }}
+                onClick={handleSaveDetails}
+              >
+                Save
+              </Button>
+              <EditDetailsForm defaultFormData={propItem} />
+            </>
+          ) : (
+            <>
+              <Details propItem={propItem} />
 
-            <Button
-              variant="contained"
-              sx={{ width: "10px" }}
-              onClick={() => setEditing(true)}
+              <Button
+                variant="contained"
+                sx={{ width: "10px" }}
+                onClick={() => setEditing(true)}
               >
-              Edit
-            </Button>
-          </>
-        )}
+                Edit
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
     </>
@@ -128,18 +107,18 @@ export default function PropDetailsPage() {
 function Details({ propItem }) {
   return (
     <Box sx={{ display: "inline-block", width: "300px" }}>
-      <p>
-        <FormGroup>
-          <TextField value={propItem.propname}></TextField>
-          {propItem.isbroken ? "hi" : "bye"}
-          {/* <ToggleButton value={false}> dafsa</ToggleButton> */}
-          <TextField value={propItem.locationname}>Location: </TextField>
-          <TextField value={propItem.description}></TextField>
-        </FormGroup>
-      </p>
+      <Card>
+        <Typography variant="h2"> {propItem.propname}</Typography>
+        {propItem.isbroken ? "Broken" : ""}
+        <Typography>
+          <b>Location:</b> {propItem.locationname}{" "}
+        </Typography>
+        <Typography>
+          <b>Description:</b> {propItem.description}
+        </Typography>
+      </Card>
       <span>
-        {/* Dropdown menu */}
-        <Button variant="outlined">Add prop to production</Button>
+        <LinkPropMenu />
       </span>
     </Box>
   );
@@ -161,4 +140,66 @@ function EditDetailsForm({ defaultFormData }) {
   // It also need to request to the update route instead of the POST route.
   // And the default selected.
   return <DetailsForm defaultFormData={data} />;
+}
+
+function LinkPropMenu({ propID }) {
+  // Generating Options by fetching
+  const order = ["production", "props-list", "props-list-item"];
+  function getChildren(itemID, orderIndex) {
+    let item = { id: itemID, label: itemID };
+    let childrenObjects = [];
+    const resource = order[orderIndex];
+    const childrenDataList = fetchItems(resource, (data) => data);
+    if (childrenDataList.length === 0) return itemID;
+    for (const child of childrenDataList) {
+      const childObjectWithGrandchildren = getChildren(child);
+      childrenObjects.push(childObjectWithGrandchildren);
+    }
+    item.children = childrenObjects;
+    return item;
+  }
+  const data = getChildren(-1, 0);
+  const Prod_PropList_PropListItem = [
+    {
+      id: "grid",
+      label: "Data Grid",
+      children: [
+        { id: "grid-community", label: "@mui/x-data-grid" },
+        { id: "grid-pro", label: "@mui/x-data-grid-pro" },
+        { id: "grid-premium", label: "@mui/x-data-grid-premium" },
+      ],
+    },
+    {
+      id: "pickers",
+      label: "Date and Time Pickers",
+      children: [
+        { id: "pickers-community", label: "@mui/x-date-pickers" },
+        { id: "pickers-pro", label: "@mui/x-date-pickers-pro" },
+      ],
+    },
+  ];
+
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  function handleSelectedItemChange(event, id) {
+    setSelectedItem(id);
+  }
+  function handleSubmitLink() {
+    const res = submitData(`props-list-item/${selectedItem}/link`, {
+      propID: selectedItem,
+    });
+  }
+  return (
+    <Stack spacing={2}>
+      <Box sx={{ minHeight: 352, minWidth: 250 }}>
+        {selectedItem} HELLO
+        <RichTreeView
+          items={Prod_PropList_PropListItem}
+          selectedItems={selectedItem}
+          onSelectedItemsChange={handleSelectedItemChange}
+        />
+        <Button onClick={handleSubmitLink}>Submit</Button>
+      </Box>
+    </Stack>
+  );
 }

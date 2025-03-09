@@ -1,5 +1,4 @@
 const tryurl = "http://127.0.0.1:5000";
-import { useEffect, useState } from "react";
 import {
   Divider,
   Drawer,
@@ -9,6 +8,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 import { fetchItems } from "./fetchItems";
 import { sampleCategories } from "./testData";
 export function Sidebar({ w, setCategoryID, selectedCategoryID }) {
@@ -22,11 +22,10 @@ export function Sidebar({ w, setCategoryID, selectedCategoryID }) {
         variant="permanent"
         anchor="left"
         sx={{
-          
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             // width: drawerWidth,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
           "& .MuiDrawer-root": {
             position: "absolute",
@@ -40,10 +39,11 @@ export function Sidebar({ w, setCategoryID, selectedCategoryID }) {
       >
         <Typography variant="h5">Categories</Typography>
         <Divider />
-        <List sx={{
-          maxWidth: "100px",
-
-        }}>
+        <List
+          sx={{
+            maxWidth: "100px",
+          }}
+        >
           <SidebarItem
             setCategoryID={setCategoryID}
             selectedCategoryID={selectedCategoryID}
@@ -68,9 +68,8 @@ export function Sidebar({ w, setCategoryID, selectedCategoryID }) {
 function SidebarItem({ categoryItem, selectedCategoryID, setCategoryID }) {
   function handleSelectCategory(categoryID) {
     // If this category is not already selected, make a change
-    const selectedThis = categoryItem.categoryid === selectedCategoryID
-    if (!selectedThis)
-      setCategoryID(categoryItem.categoryid);
+    const selectedThis = categoryItem.categoryid === selectedCategoryID;
+    if (!selectedThis) setCategoryID(categoryItem.categoryid);
   }
   return (
     <ListItem>
