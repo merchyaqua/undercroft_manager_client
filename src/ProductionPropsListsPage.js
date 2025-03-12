@@ -3,16 +3,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchItems, handleFormSubmit } from "./fetchItems";
 
-const samplePropsLists = [
-  {
-    title: "Set",
-    propsListID: 122,
-  },
-  {
-    title: "Set",
-    propsListID: 122,
-  },
-];
 export function ProductionPropsListsPage() {
   const productionID = useParams()["productionID"];
   const [productionTitle, setProductionTitle] = useState("");

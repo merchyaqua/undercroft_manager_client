@@ -7,9 +7,6 @@ import ProductionsPage from "./ProductionsPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
-  
-
-
   const [page, setPage] = useState({name: "productions"});
   const [previousPage, setPreviousPage] = useState(null);
   function goToPage(newPage){

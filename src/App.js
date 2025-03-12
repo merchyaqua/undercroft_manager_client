@@ -1,4 +1,3 @@
-const tryurl = "http://127.0.0.1:5000/";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./Navbar";
@@ -16,7 +15,6 @@ function App() {
           <Route index element={<Main />} />
           <Route path="prop/:propID" element={<PropDetailsPage />} />
           <Route path="add-prop" element={<PropAddPage />} />
-          {/* https://hygraph.com/blog/routing-in-react#how-to-implement-dynamic-routing-with-react-router */}
           <Route path="productions" element={<ProductionsPage />} />
           {/* <Route path="production/:productionID*" element={<ProductionDetailPage/>} /> would be production details page*/}
           <Route

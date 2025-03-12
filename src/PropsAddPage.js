@@ -16,40 +16,11 @@ import FileUpload from "./FileUpload";
 import { fetchItems, handleFormSubmit, submitData } from "./fetchItems";
 import { checkFormRequiredFilled } from "./helpers";
 import uploadToImgur from "./ImgurAPI";
-const tryurl = "http://127.0.0.1:5000/";
-
-const sampleProps = [
-  {
-    name: "test",
-    photopath: `logo192.png`,
-    locationname: "locname",
-    locationid: "loc",
-    isbroken: "false",
-    propid: "id",
-    status: "status",
-    description: "testdesc",
-  },
-];
-const sampleCategories = [
-  {
-    name: "testCategory",
-    categoryid: 123,
-  },
-  {
-    name: "testCategory2",
-    categoryid: 124,
-  },
-];
-const sampleLocations = [{ name: "Undercroft", locationID: 1 }];
 
 export default function PropAddPage({}) {
   return (
-    // could have the image left half and details right half be a two split flex items or something
-    <
-      // sx={{ flexGrow: 1, width: `calc(100%-${100}px)`, ml: `${100}px` }}
-    >
+    <>
       <Typography variant="h2">Add a prop!</Typography>
-
       <DetailsForm categoryItems={sampleCategories} />
     </>
   );
@@ -63,55 +34,28 @@ export function DetailsForm({
     photoPath: null,
   },
 }) {
+  // States to manage the form
   const requiredFields = ["name", "categoryID", "locationID"];
   const [formData, setFormData] = useState(defaultFormData);
   const [image, setImage] = useState(null);
   const [canSubmit, setCanSubmit] = useState(false);
   const navigate = useNavigate();
 
-  // check all values exist
+  // On change of any of the form data, check all values exist
   useEffect(() => {
-    // No submitting while adding
+    // No submitting prop while adding a new location or category option.
     if (formData.locationID === "add" || formData.categoryID === "add") {
       setCanSubmit(false);
     } else {
+      // Check required fields are filled. If so, you can submit.
       setCanSubmit(checkFormRequiredFilled(requiredFields, formData));
     }
   }, [formData]);
-  // Fetch a list of locations and categories as options
-
-  // instead of using the fetched results, we want the most up-to-date categories.
-  function handleChange(e) {
-    const name = e.target.name;
-    const value = e.target.value;
-    // handle add new for location and category
-    setFormData((values) => ({ ...values, [name]: value }));
-  }
-  async function handleSubmit(e, noReload) {
-    let photoPath = null;
-    if (image) {
-      // Directly upload to imgur and get a link.
-      console.log("Uploading to imgur");
-      photoPath = await uploadToImgur(image, "idk", formData.name);
-      console.log("Uploaded to imgur");
-    }
-    const receivedData = await handleFormSubmit(e, "prop", {
-      ...formData,
-      photoPath: photoPath,
-    });
-    console.log(receivedData);
-    if (!noReload) {
-      // Don't reload when save details
-      const propID = receivedData.propid;
-      navigate("/prop/" + propID);
-      // setFormData({});
-    }
-  }
-
+  
+  // Set up location and category states for fetching
   const [locationOptions, setLocationOptions] = useState([
     { name: "Loading...", locationid: null },
   ]);
-
   const [categoryOptions, setCategoryOptions] = useState([
     { name: "Loading...", categoryid: null },
   ]);
@@ -143,8 +87,34 @@ export function DetailsForm({
     }));
   }, [categoryOptions]);
 
+  function handleChange(e) {
+    const name = e.target.name;
+    const value = e.target.value;
+    // handle add new for location and category
+    setFormData((values) => ({ ...values, [name]: value }));
+  }
+  async function handleSubmit(e, noReload) {
+    // Upload photo if exists, then submit form data with the photo URL.
+    let photoPath = null;
+    if (image) {
+      // Directly upload to imgur and get a link.
+      console.log("Uploading to imgur");
+      photoPath = await uploadToImgur(image, "idk", formData.name);
+      console.log("Uploaded to imgur");
+    }
+    const receivedData = await handleFormSubmit(e, "prop", {
+      ...formData,
+      photoPath: photoPath,
+    });
+    console.log(receivedData);
+    if (!noReload) {
+      // Don't reload when save details
+      const propID = receivedData.propid;
+      navigate("/prop/" + propID);
+      // setFormData({});
+    }
+  }
   return (
-    // https://stackoverflow.com/questions/65531477/how-to-post-form-data-using-material-ui-into-api
     <Box sx={{ display: "inline-block" }}>
       <form>
         <FormGroup>
@@ -165,7 +135,6 @@ export function DetailsForm({
             }
             label="Broken"
             name="isBroken"
-            // UGHHHH
           />
           <DropdownMenu
             label="Location"
@@ -236,13 +205,11 @@ function DropdownMenu({
           setValue={setValue}
         />
       )}
-
       <InputLabel
         variant="standard"
         htmlFor="uncontrolled-native"
         key={"label"}
-      >
-        {label}
+      >{label}
       </InputLabel>
       <NativeSelect
         onChange={onChange}
@@ -253,15 +220,12 @@ function DropdownMenu({
           id: "uncontrolled-native",
         }}
       >
-        {/* uh oh the attributes - might have to end up returning categoryid as just id when being requested on its own */}
         {[...options].map((item) => {
           const id = item.categoryid || item.locationid;
           return (
-            <>
               <option value={id} key={id}>
                 {item.name}
               </option>
-            </>
           );
         })}
       </NativeSelect>

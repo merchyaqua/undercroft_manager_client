@@ -16,9 +16,6 @@ import "./App.css";
 import Loader from "./Loader";
 import { Sidebar } from "./Sidebar";
 import { sampleProps, sampleTags } from "./testData";
-const KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dXR5eWhycWhjeG1ieHVsdXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcwMjEzNzMsImV4cCI6MjA1MjU5NzM3M30.Gd-9bO3KMEvcD-i5ug9Fr0SRvs_hkwvk1X-3yuoq4Vg";
-const DBURL = `https://otutyyhrqhcxmbxuluvv.supabase.co/rest/v1/prop?apikey=${KEY}`;
 const testing = false;
 
 export default function Main() {
@@ -87,17 +84,16 @@ export default function Main() {
           sx={{ flexGrow: 1, ml: `200px`, position: "relative" }}
           component="main"
         >
+          {/* Search field */}
           <TextField
             id="query"
             sx={{ width: "500px" }}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a prop"
           />
-          {/* <Button>Search!</Button> */}
 
           <TagsInput tagsData={sampleTags} />
           <Divider />
-          {/* As part of mental health week, I am noticing the ease of writing JSX that I normally take for granted. Imagine how the developers worked to parse complex nested syntax! */}
           <Loader error={error} loading={loading}>
             <PropResults propResults={propResults} />
           </Loader>
@@ -118,18 +114,16 @@ function PropResults({ propResults }) {
 }
 function Prop({ data }) {
   const navigate = useNavigate();
-
+  // Clicking the list item links to the prop detail page
   function handleSelectProp() {
     navigate("prop/" + data.propid);
   }
+  // Destructuring the prop data JSON object
   const {
     propname: name,
     photopath: imgsrc,
     locationname: locname,
-    locationid: loc,
     isbroken: isbroken,
-    propid: id,
-    status: status,
   } = data;
   // console.log("here");
   return (
@@ -139,12 +133,10 @@ function Prop({ data }) {
         className="prop"
         title={<Typography variant="h5">{name}</Typography>}
         subtitle={
-          <>
-            <span>
-              Location: {locname}
-              <br /> Status: {isbroken ? "BROKEN" : "aVAIL"}
-            </span>
-          </>
+          <span>
+            Location: {locname}
+            <br /> Status: {isbroken ? "BROKEN" : "AVAILABLE"}
+          </span>
         }
         position="below"
       />
@@ -175,4 +167,8 @@ function TagsInput({ tagsData }) {
       <Divider />
     </FormControl>
   );
+}
+
+{
+  /* As part of mental health week, I am noticing the ease of writing JSX that I normally take for granted. Imagine how the developers worked to parse complex nested syntax! */
 }

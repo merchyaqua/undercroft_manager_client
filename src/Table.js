@@ -19,14 +19,8 @@ import { handleFormSubmit, submitData } from "./fetchItems";
 // https://codesandbox.io/p/sandbox/material-ui-table-dynamic-wrod4?file=%2Fsrc%2Findex.js%3A10%2C7
 export function DataTable({ title, data, setSubmitted, propsListID }) {
   // Extract headers and not include id as a field
-  const sample = {
-    name: "2x Sword",
-    description: "...he swung his sword at the guard",
-    sourcestatus: "waiting",
-    action: "Buy from Amazon",
-    propslistitemid: 22,
-  };
-  const headers = Object.keys(sample).filter((s) => s !== "propslistitemid");
+  
+  const headers = Object.keys(samplePropsListItem).filter((s) => s !== "propslistitemid");
   const initialNewRow = {
     name: "",
     description: "",

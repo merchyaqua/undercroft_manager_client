@@ -8,6 +8,7 @@ const tryurl = "http://127.0.0.1:5000/";
 
 import { Box, Button, Card, Typography } from "@mui/material";
 import { fetchItems, submitData } from "./fetchItems";
+import { fetchOptionsTree } from "./helpers";
 
 const sampleProps = [
   {
@@ -143,41 +144,26 @@ function EditDetailsForm({ defaultFormData }) {
 }
 
 function LinkPropMenu({ propID }) {
-  // Generating Options by fetching
-  const order = ["production", "props-list", "props-list-item"];
-  function getChildren(itemID, orderIndex) {
-    let item = { id: itemID, label: itemID };
-    let childrenObjects = [];
-    const resource = order[orderIndex];
-    const childrenDataList = fetchItems(resource, (data) => data);
-    if (childrenDataList.length === 0) return itemID;
-    for (const child of childrenDataList) {
-      const childObjectWithGrandchildren = getChildren(child);
-      childrenObjects.push(childObjectWithGrandchildren);
-    }
-    item.children = childrenObjects;
-    return item;
-  }
-  const data = getChildren(-1, 0);
-  const Prod_PropList_PropListItem = [
-    {
-      id: "grid",
-      label: "Data Grid",
-      children: [
-        { id: "grid-community", label: "@mui/x-data-grid" },
-        { id: "grid-pro", label: "@mui/x-data-grid-pro" },
-        { id: "grid-premium", label: "@mui/x-data-grid-premium" },
-      ],
-    },
-    {
-      id: "pickers",
-      label: "Date and Time Pickers",
-      children: [
-        { id: "pickers-community", label: "@mui/x-date-pickers" },
-        { id: "pickers-pro", label: "@mui/x-date-pickers-pro" },
-      ],
-    },
-  ];
+  const Prod_PropList_PropListItem = fetchOptionsTree()
+  // const Prod_PropList_PropListItem = [
+  //   {
+  //     id: "grid",
+  //     label: "Data Grid",
+  //     children: [
+  //       { id: "grid-community", label: "@mui/x-data-grid" },
+  //       { id: "grid-pro", label: "@mui/x-data-grid-pro" },
+  //       { id: "grid-premium", label: "@mui/x-data-grid-premium" },
+  //     ],
+  //   },
+  //   {
+  //     id: "pickers",
+  //     label: "Date and Time Pickers",
+  //     children: [
+  //       { id: "pickers-community", label: "@mui/x-date-pickers" },
+  //       { id: "pickers-pro", label: "@mui/x-date-pickers-pro" },
+  //     ],
+  //   },
+  // ];
 
   const [selectedItem, setSelectedItem] = useState(null);
 
