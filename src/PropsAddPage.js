@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-// import sampleProps from "./App"
 import {
   Box,
   Button,
@@ -11,11 +9,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { redirect, useNavigate } from "react-router-dom";
 import FileUpload from "./FileUpload";
-import { fetchItems, handleFormSubmit, submitData } from "./fetchItems";
+import {
+  fetchItems,
+  handleFormSubmit,
+  submitData,
+  uploadToImgur,
+} from "./fetchItems";
 import { checkFormRequiredFilled } from "./helpers";
-import uploadToImgur from "./ImgurAPI";
+import { sampleCategories } from "./testData";
 
 export default function PropAddPage({}) {
   return (
@@ -33,6 +37,7 @@ export function DetailsForm({
     description: "",
     photoPath: null,
   },
+  adding
 }) {
   // States to manage the form
   const requiredFields = ["name", "categoryID", "locationID"];
@@ -51,7 +56,7 @@ export function DetailsForm({
       setCanSubmit(checkFormRequiredFilled(requiredFields, formData));
     }
   }, [formData]);
-  
+
   // Set up location and category states for fetching
   const [locationOptions, setLocationOptions] = useState([
     { name: "Loading...", locationid: null },
@@ -93,7 +98,7 @@ export function DetailsForm({
     // handle add new for location and category
     setFormData((values) => ({ ...values, [name]: value }));
   }
-  async function handleSubmit(e, noReload) {
+  async function handleSubmit(e, reload=false, redirect=false) {
     // Upload photo if exists, then submit form data with the photo URL.
     let photoPath = null;
     if (image) {
@@ -107,11 +112,11 @@ export function DetailsForm({
       photoPath: photoPath,
     });
     console.log(receivedData);
-    if (!noReload) {
-      // Don't reload when save details
-      const propID = receivedData.propid;
+    if (reload){
+      setFormData({});
+    } else if (redirect) {
       navigate("/prop/" + propID);
-      // setFormData({});
+      const propID = receivedData.propid;
     }
   }
   return (
@@ -162,23 +167,11 @@ export function DetailsForm({
             name="description"
           />
         </FormGroup>
-        <span>
-          {/* All buttons will submit the data to the server. The third one resets the whole page. The second one will simply submit the data and do nothing.*/}
-          <Button
-            disabled={!canSubmit}
-            onClick={(e) => handleSubmit(e, true)}
-            variant="contained"
-          >
-            Keep adding but save details for next add
-          </Button>
-          <Button
-            disabled={!canSubmit}
-            onClick={(e) => handleSubmit(e, false)}
-            variant="contained"
-          >
-            Keep adding without saving details for next add
-          </Button>
-        </span>
+        <PropDetailsButtonGroup
+          canSubmit={canSubmit}
+          handleSubmit={handleSubmit}
+          adding={adding}
+        />
       </form>
     </Box>
   );
@@ -209,7 +202,8 @@ function DropdownMenu({
         variant="standard"
         htmlFor="uncontrolled-native"
         key={"label"}
-      >{label}
+      >
+        {label}
       </InputLabel>
       <NativeSelect
         onChange={onChange}
@@ -223,9 +217,9 @@ function DropdownMenu({
         {[...options].map((item) => {
           const id = item.categoryid || item.locationid;
           return (
-              <option value={id} key={id}>
-                {item.name}
-              </option>
+            <option value={id} key={id}>
+              {item.name}
+            </option>
           );
         })}
       </NativeSelect>
@@ -267,5 +261,41 @@ function DropdownAddNewForm({
       />
       <Button onClick={handleAddNew}>Submit</Button>
     </Box>
+  );
+}
+
+function PropDetailsButtonGroup({ canSubmit, handleSubmit, adding = true }) {
+  return (
+    <>
+      {adding && (
+        <span>
+          {/* All buttons will submit the data to the server. The third one resets the whole page. The second one will simply submit the data and do nothing.*/}
+          
+          <Button
+            disabled={!canSubmit}
+            onClick={(e) => handleSubmit(e, redirect=true)}
+            >
+            Add and view
+          </Button>
+          <Button
+            disabled={!canSubmit}
+            onClick={(e) => handleSubmit(e, reload=false)}
+            variant="contained"
+          >
+            Keep adding but persist details
+          </Button>
+          <Button
+            disabled={!canSubmit}
+            onClick={(e) => handleSubmit(e, reload=true)}
+            variant="contained"
+          >
+            Keep adding without saving details
+          </Button>
+        </span>
+      )}
+      {!adding && <Button>
+        Save edit
+        </Button>}
+    </>
   );
 }

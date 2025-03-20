@@ -24,7 +24,7 @@ export default function ProductionsPage({}) {
   const [adding, setAdding] = useState(false);
 
   const [productions, setProductions] = useState(sampleProductions);
-  useEffect(() => fetchItems("production", setProductions), []);
+  useEffect(() => fetchItems("production", setProductions), [adding]);
   // console.log(productions);
 
   return (
@@ -32,7 +32,7 @@ export default function ProductionsPage({}) {
       <Button variant="outlined" onClick={() => setAdding(!adding)}>
         {!adding ? "+ Add new production" : "- Close"}
       </Button>
-      {adding && <ProductionForm />}
+      {adding && <ProductionForm setAdding={setAdding} />}
       <Divider></Divider>
       <Box centered sx={{ display: "flex", width: "100%", margin: "10%" }}>
         <ImageList cols={3}>
@@ -51,7 +51,7 @@ export default function ProductionsPage({}) {
 
 function Production({ data, navigate }) {
   const {
-    name: name,
+    title: name,
     photopath: imgsrc,
     firstshowdate: firstShowDate,
     lastshowdate: lastShowDate,
@@ -82,7 +82,7 @@ function Production({ data, navigate }) {
   );
 }
 
-function ProductionForm() {
+function ProductionForm({ setAdding }) {
   const [formData, setFormData] = useState({
     firstShowDate: dayjs(),
     lastShowDate: dayjs(),
@@ -114,12 +114,15 @@ function ProductionForm() {
         />
         {/* Ensure a correct format of dates is submitted */}
         <Button
-          onClick={(e) =>
+          onClick={(e) => {
             handleFormSubmit(e, "production", {
               ...formData,
               firstShowDate: formData.firstShowDate.toISOString(),
               lastShowDate: formData.lastShowDate.toISOString(),
             })
+            setAdding(false)
+          }
+            
           }
           variant="contained"
         >

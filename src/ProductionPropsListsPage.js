@@ -1,10 +1,13 @@
 import { Box, Button, List, ListItemButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import DeleteButton from "./DeleteButton";
 import { fetchItems, handleFormSubmit } from "./fetchItems";
-
+import { samplePropsLists } from "./testData";
 export function ProductionPropsListsPage() {
+  // Extract productionID from URL
   const productionID = useParams()["productionID"];
+  // Retrieve the name of the production once
   const [productionTitle, setProductionTitle] = useState("");
   useEffect(
     () =>
@@ -13,26 +16,23 @@ export function ProductionPropsListsPage() {
       ),
     []
   );
-
-  const [propsLists, setPropsLists] = useState([]);
   const navigate = useNavigate();
+  const [propsLists, setPropsLists] = useState(samplePropsLists);
   const [adding, setAdding] = useState(false);
-
-  useEffect(
-    () => fetchItems(`production/${productionID}/props-list`, setPropsLists),
-    []
-  );
-
-  useEffect(() => console.log(propsLists), [propsLists]);
+  const [submitted, setSubmitted] = useState(false);
+  // Retrieve the names and IDs of prop lists belonging to this production
+  useEffect(() => fetchItems(`production/${productionID}/props-list`, setPropsLists), [submitted]);
+  // useEffect(() => console.log(propsLists), [propsLists]); debug print.
   return (
     <>
       <h2>Props Lists for {productionTitle}</h2>
-      Rushing so I can beat the line, but what if all I want is conversation and
-      time?
+      {/* Toggle the props list adding form */}
       <Button variant="outlined" onClick={() => setAdding(!adding)}>
         {!adding ? "+ Add new props list" : "- Close"}
       </Button>
-      {adding && <PropsListForm productionID={productionID} />}
+      {adding && <PropsListForm productionID={productionID} setSubmitted={()=>setSubmitted(!submitted)} />}
+      {/* Display a list of props lists */}
+      <DeleteButton resource={'production/'+productionID} >Delete production </DeleteButton>
       <List>
         {propsLists.map((propsListDetails) => {
           const id = propsListDetails.propslistid;
@@ -49,12 +49,11 @@ export function ProductionPropsListsPage() {
   );
 }
 
-function PropsListForm({ productionID }) {
+function PropsListForm({ productionID, setSubmitted }) {
   const [formData, setFormData] = useState({
     // isCostumeList: false,
   });
   function handleChange(e) {
-    // check im giving creds to this code
     const name = e.target.name;
     const value = e.target.value;
     setFormData((values) => ({ ...values, [name]: value }));
@@ -71,7 +70,10 @@ function PropsListForm({ productionID }) {
       />
       <Button
         onClick={(e) =>
-          handleFormSubmit(e, `production/${productionID}/props-list`, formData)
+          {
+            handleFormSubmit(e, `production/${productionID}/props-list`, formData)
+            setSubmitted();
+          }
         }
         variant="contained"
       >

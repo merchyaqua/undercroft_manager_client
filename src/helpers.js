@@ -11,7 +11,7 @@ export function checkFormRequiredFilled(requiredFields, formData) {
 }
 
 // Generating Options by fetching
-export function fetchOptionsTree() {
+export async function fetchOptionsTree() {
   // Post-order traversal
   const order = [
     {
@@ -37,18 +37,22 @@ export function fetchOptionsTree() {
   ];
   async function getChildren(dataItem, orderIndex) {
     console.log("call");
-    // Return when reached bottom of hierarchy - leaf node.
-    if (orderIndex == order.length - 1) {
-      console.log("end");
-      return dataItem["propsListItems"];
-    }
     let childNodes = [];
     const idName = order[orderIndex].idName;
     const itemID = dataItem[idName];
+    // Return when reached bottom of hierarchy - leaf node.
+    if (orderIndex == order.length - 1) {
+      console.log(dataItem)
+      console.log("end");
+       return {
+        id: itemID,
+        label: dataItem.name,
+      }
+    }
     // When the node is not a propsListItem, the ID should not be valid for the linking. This will be how the form rejects item being selected. It's weird using MUI so potentially using custom List tree would work.
     let node = {
-      id: (dataItem.name || dataItem.title) + itemID,
-      label: dataItem.name || dataItem.title,
+      id: (dataItem.name || dataItem.title || dataItem.propslisttitle) + itemID,
+      label: dataItem.name || dataItem.title || dataItem.propslisttitle,
     };
     // Get the children data: get the URL to fetch the next level down for this parent item
     let resource = order[orderIndex + 1].getResource(itemID);
@@ -63,12 +67,12 @@ export function fetchOptionsTree() {
       childNodes.push(childNode);
     }
     // After all the children have assembled their children, this is assembled as its own children list
-    node.children = childNodes;
+    if (childNodes.length > 0) node.children = childNodes;
     return node;
   }
-  const data = getChildren({ name: "base", baseID: "" }, 0);
+  const data = await getChildren({ name: "base", baseID: "" }, 0);
   console.log(data);
-  return data;
+  return data.children;
 }
 
 // function fakeFetch(resource, fakeSetState){

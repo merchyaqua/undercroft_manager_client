@@ -3,37 +3,15 @@ import { RichTreeView } from "@mui/x-tree-view";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DetailsForm } from "./PropsAddPage";
-// import sampleProps from "./App"
-const tryurl = "http://127.0.0.1:5000/";
+import { sampleProps } from "./testData";
 
 import { Box, Button, Card, Typography } from "@mui/material";
 import { fetchItems, submitData } from "./fetchItems";
 import { fetchOptionsTree } from "./helpers";
+import DeleteButton from "./DeleteButton";
 
-const sampleProps = [
-  {
-    propname: "test",
-    photopath: "http://localhost:3000/logo192.png",
-    locationname: "locname",
-    locationid: "loc",
-    isbroken: "false",
-    propid: "id",
-    status: "status",
-    description: "testdesc",
-  },
-];
-const sampleCategories = [
-  {
-    name: "testCategory",
-    categoryid: 123,
-  },
-  {
-    name: "testCategory2",
-    categoryid: 124,
-  },
-];
 export default function PropDetailsPage() {
-  const [propItem, setPropItem] = useState(sampleProps[0]);
+  const [propItem, setPropItem] = useState(null);
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
   const { propID } = useParams();
@@ -43,23 +21,18 @@ export default function PropDetailsPage() {
   console.log(propID);
 
   return (
-    // could have the image left half and details right half be a two split flex items or something
-    <
-      // sx={{ flexGrow: 1, width: `calc(100%-${100}px)`, ml: `${100}px` }}
-    >
+    !propItem ? "Not found" :
+    <>
       <div sx={{ display: "block", width: "100%" }}>
-        <Button
-          variant="outlined"
-          onClick={() => navigate(-1)}
-          sx={{ float: "left" }}
-        >
-          ⬅️Back
-        </Button>
-        <Button variant="outlined" sx={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+
+        <Button variant="outlined">
           ⭐Star
         </Button>
+        <DeleteButton resource={'prop/'+propID}>Delete prop</DeleteButton>
+        </Box>
       </div>
-      <Box sx={{ display: "grid" }}>
+      <Box sx={{ display: "grid", marginLeft: "10px"}}>
         <Box>
           <Box sx={{ display: "inline-block", width: "50%" }}>
             <img src={propItem.photopath} style={{ maxWidth: "100%" }} />
@@ -119,7 +92,12 @@ function Details({ propItem }) {
         </Typography>
       </Card>
       <span>
-        <LinkPropMenu />
+        {propItem.available}
+        {
+          propItem.available === "In use" ?
+          "In use" : <LinkPropMenu propID={propItem.propid} /> 
+
+        }
       </span>
     </Box>
   );
@@ -140,11 +118,18 @@ function EditDetailsForm({ defaultFormData }) {
   // we must do manual mapping before giving to form, which records details with capitalisation.
   // It also need to request to the update route instead of the POST route.
   // And the default selected.
-  return <DetailsForm defaultFormData={data} />;
+  return <DetailsForm defaultFormData={data} adding={false}/>;
 }
 
 function LinkPropMenu({ propID }) {
-  const Prod_PropList_PropListItem = fetchOptionsTree()
+  const [optionsTree, setOptionsTree] = useState([]);
+  useEffect(() => {
+    async function fetchOp() {
+      const data = await fetchOptionsTree();
+      setOptionsTree(data);
+    }
+    fetchOp();
+  }, []);
   // const Prod_PropList_PropListItem = [
   //   {
   //     id: "grid",
@@ -166,25 +151,28 @@ function LinkPropMenu({ propID }) {
   // ];
 
   const [selectedItem, setSelectedItem] = useState(null);
+  // Valid number means a propsListItem is selected and can be submitted to link
+  const canSubmit = !isNaN(selectedItem) && selectedItem ;
 
   function handleSelectedItemChange(event, id) {
     setSelectedItem(id);
   }
   function handleSubmitLink() {
+    console.log(propID)
     const res = submitData(`props-list-item/${selectedItem}/link`, {
-      propID: selectedItem,
-    });
+      propID: propID,
+    }, "PUT");
   }
   return (
     <Stack spacing={2}>
       <Box sx={{ minHeight: 352, minWidth: 250 }}>
-        {selectedItem} HELLO
+        {Number(selectedItem)} {canSubmit && "Hi"}
         <RichTreeView
-          items={Prod_PropList_PropListItem}
+          items={optionsTree}
           selectedItems={selectedItem}
           onSelectedItemsChange={handleSelectedItemChange}
         />
-        <Button onClick={handleSubmitLink}>Submit</Button>
+        <Button disabled={!canSubmit} onClick={handleSubmitLink}>Link</Button>
       </Box>
     </Stack>
   );

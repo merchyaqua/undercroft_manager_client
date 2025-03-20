@@ -1,7 +1,7 @@
 export const sampleProps = [
   {
     name: "test",
-    photopath: `logo192.png`,
+    photopath: `/logo192.png`,
 
     locationname: "locname",
     locationid: "loc",
@@ -49,8 +49,8 @@ export const samplePropsLists = [
     propsListID: 122,
   },
   {
-    title: "Set",
-    propsListID: 122,
+    title: "Props",
+    propsListID: 22,
   },
 ];
 
@@ -69,13 +69,14 @@ export const samplePropsListItems = [
     sourcestatus: "waiting",
     action: "Buy from Amazon",
     propslistitemid: 22,
+    propid: 11
   },
   {
-    name: "2x Sword",
-    description: "...he swung his sword at the guard",
-    sourcestatus: "waiting",
-    action: "Buy from Amazon",
-    propslistitemid: 22,
+    name: "2x Tankards",
+    description: "For the bar scene",
+    sourcestatus: "Done",
+    action: "",
+    propslistitemid: 3,
   },
 ];
 export const sampleLocations = [{ name: "Undercroft", locationID: 1 }];

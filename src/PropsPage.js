@@ -124,6 +124,7 @@ function Prop({ data }) {
     photopath: imgsrc,
     locationname: locname,
     isbroken: isbroken,
+    available: available
   } = data;
   // console.log("here");
   return (
@@ -134,8 +135,9 @@ function Prop({ data }) {
         title={<Typography variant="h5">{name}</Typography>}
         subtitle={
           <span>
+            {available}
             Location: {locname}
-            <br /> Status: {isbroken ? "BROKEN" : "AVAILABLE"}
+            <br /> Status: {isbroken ? "BROKEN" :( available )}
           </span>
         }
         position="below"

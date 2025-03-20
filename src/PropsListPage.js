@@ -1,44 +1,43 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import DeleteButton from "./DeleteButton";
 import { fetchItems } from "./fetchItems";
 import DataTable from "./Table";
-const tryurl = "127.0.0.0:5000";
-const samplePropsList = [
-  {
-    name: "2x Sword",
-    description: "...he swung his sword at the guard",
-    sourcestatus: "waiting",
-    action: "Buy from Amazon",
-    propslistitemid: 2,
-  },
-  {
-    name: "2x Sword",
-    description: "...he swung his sword at the guard",
-    sourcestatus: "waiting",
-    action: "Buy from Amazon",
-    propslistitemid: 22,
-  },
-];
+import { samplePropsListItems } from "./testData";
 
 export function PropsListPage() {
+  const [propsListContent, setPropsListContent] = useState({
+    productionTitle: "Play",
+    productionID: null,
+    propsListTitle: "Props",
+    propsListItems: samplePropsListItems,
+  });
+
   const propsListID = useParams()["propsListID"];
-  // The data is re-fetched once something gets submitted.
   const [submitted, setSubmitted] = useState(false);
 
-  const [propsListContent, setPropsListContent] = useState({
-    productionTitle: "Me",
-    propsListTitle: "hi",
-    propsListItems: samplePropsList,
-  });
+  // Load propslistitems on first load of page, then whenever submitted is changed, reloads again.
   useEffect(() => {
-    // Load propslistitems on first load of page, then whenever submitted is changed, reloads again.
     console.log("fetched");
     fetchItems("props-list/" + propsListID, setPropsListContent);
   }, [submitted]);
+  // With submitted in the dependency list, data is completely re-fetched once something gets submitted,
+  // changing the submitted state - be it a new item, an edit, a toggle done, or a delete.
+
   return (
     <>
-      // https://www.geeksforgeeks.org/how-to-create-a-table-in-reactjs/
-      {/* {propsListContent.propsListItems} */}
+      <DeleteButton
+        resource={"props-list/" + propsListID}
+        setSubmitted={
+          () => {
+            // Redirect to production page after delete
+            const navigate = useNavigate();
+            navigate("production/"+productionID+"/props-lists")
+          }
+        }
+      >
+        Delete props list
+      </DeleteButton>
       <DataTable
         title={
           propsListContent.propsListTitle +
