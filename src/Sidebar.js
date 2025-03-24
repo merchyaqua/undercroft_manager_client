@@ -13,7 +13,7 @@ import { sampleCategories } from "./testData";
 export function Sidebar({ w, setCategoryID, selectedCategoryID }) {
   const [categories, setCategories] = useState(sampleCategories);
   // Fetch category data here
-  useEffect(() => fetchItems("category", setCategories), []);
+  useEffect(() => fetchItems("category", setCategories), [selectedCategoryID]);
 
   return (
     <>

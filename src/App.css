@@ -38,7 +38,11 @@
 }
 
 .broken {
-  background-color: red;
+  background-color: rgb(231, 140, 140);
+}
+
+.in-use {
+  background-color: bisque;
 }
 
 .prop {

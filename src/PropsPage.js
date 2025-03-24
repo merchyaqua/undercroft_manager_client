@@ -1,4 +1,3 @@
-const tryurl = "http://127.0.0.1:5000/";
 import {
   Autocomplete,
   Box,
@@ -16,6 +15,7 @@ import "./App.css";
 import Loader from "./Loader";
 import { Sidebar } from "./Sidebar";
 import { sampleProps, sampleTags } from "./testData";
+import { tryurl } from "./fetchItems";
 const testing = false;
 
 export default function Main() {
@@ -124,20 +124,24 @@ function Prop({ data }) {
     photopath: imgsrc,
     locationname: locname,
     isbroken: isbroken,
-    available: available
   } = data;
+  const available = data.available === 1;
+  console.log(data.available)
+  const statusText = isbroken ? "BROKEN" : (available? "Available" : "In use")
+  const squareClass = isbroken ? "broken" : (!available && "in-use")
   // console.log("here");
   return (
-    <ImageListItem className={"prop" + (isbroken === "true" && " broken")}>
+    
+    <ImageListItem className={"prop " + squareClass}>
       <img onClick={handleSelectProp} src={imgsrc} alt={name}></img>
       <ImageListItemBar
         className="prop"
         title={<Typography variant="h5">{name}</Typography>}
         subtitle={
           <span>
-            {available}
+            {data.available}
             Location: {locname}
-            <br /> Status: {isbroken ? "BROKEN" :( available )}
+            <br /> Status: {statusText}
           </span>
         }
         position="below"

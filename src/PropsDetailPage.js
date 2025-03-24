@@ -15,7 +15,9 @@ export default function PropDetailsPage() {
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
   const { propID } = useParams();
-  function handleSaveDetails() {}
+  function handleSaveDetails() {
+    sub
+  }
   // Fetching data for this prop
   useEffect(() => fetchItems("prop/" + propID, setPropItem), []);
   console.log(propID);
@@ -29,7 +31,7 @@ export default function PropDetailsPage() {
         <Button variant="outlined">
           ⭐Star
         </Button>
-        <DeleteButton resource={'prop/'+propID}>Delete prop</DeleteButton>
+        <DeleteButton resource={'prop/'+propID} navigate={navigate}>Delete prop</DeleteButton>
         </Box>
       </div>
       <Box sx={{ display: "grid", marginLeft: "10px"}}>
@@ -88,6 +90,9 @@ function Details({ propItem }) {
           <b>Location:</b> {propItem.locationname}{" "}
         </Typography>
         <Typography>
+          <b>Category:</b> {propItem.categoryid}{" "}
+        </Typography>
+        <Typography>
           <b>Description:</b> {propItem.description}
         </Typography>
       </Card>
@@ -105,12 +110,12 @@ function Details({ propItem }) {
 
 function EditDetailsForm({ defaultFormData }) {
   const data = {
-    name: defaultFormData.name,
+    name: defaultFormData.propname,
     photoPath: defaultFormData.photopath,
     locationName: defaultFormData.locationname,
     locationID: defaultFormData.locationid,
     isBroken: defaultFormData.isbroken,
-    propID: defaultFormData.propID,
+    propID: defaultFormData.propid,
     status: defaultFormData.status,
     description: defaultFormData.description,
   };
@@ -166,7 +171,7 @@ function LinkPropMenu({ propID }) {
   return (
     <Stack spacing={2}>
       <Box sx={{ minHeight: 352, minWidth: 250 }}>
-        {Number(selectedItem)} {canSubmit && "Hi"}
+        {/* {Number(selectedItem)} {canSubmit && "Hi"} */}
         <RichTreeView
           items={optionsTree}
           selectedItems={selectedItem}
