@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/undercroft_manager_client/static/css/main.39843833.css",
+    "main.js": "/undercroft_manager_client/static/js/main.ddaabde5.js",
+    "index.html": "/undercroft_manager_client/index.html",
+    "main.39843833.css.map": "/undercroft_manager_client/static/css/main.39843833.css.map",
+    "main.ddaabde5.js.map": "/undercroft_manager_client/static/js/main.ddaabde5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.39843833.css",
+    "static/js/main.ddaabde5.js"
+  ]
+}
