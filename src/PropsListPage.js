@@ -10,11 +10,11 @@ export function PropsListPage() {
     productionTitle: "Play",
     productionID: null,
     propsListTitle: "Props",
-    propsListItems: samplePropsListItems,
+    propsListItems: [],
   });
 
   const propsListID = useParams()["propsListID"];
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(true);
 
   // Load propslistitems on first load of page, then whenever submitted is changed, reloads again.
   useEffect(() => {

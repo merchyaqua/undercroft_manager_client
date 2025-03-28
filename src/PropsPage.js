@@ -8,6 +8,8 @@ import {
   ImageListItemBar,
   TextField,
   Typography,
+  Grid2,
+  Item
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -105,11 +107,17 @@ export default function Main() {
 
 function PropResults({ propResults }) {
   return (
-    <ImageList cols={3}>
+    // <ImageList cols={3} gap={8} >
+    
+  <Grid2 container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
       {propResults.map((propResult) => (
+        
+    <Grid2 key={propResult.propid} size={{ xs: 2, sm: 4, md: 4 }}>
+      
         <Prop key={propResult.propid} data={propResult} />
-      ))}
-    </ImageList>
+    </Grid2>
+      ))}</Grid2>
+    // </ImageList>
   );
 }
 function Prop({ data }) {

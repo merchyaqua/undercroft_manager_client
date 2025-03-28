@@ -17,11 +17,14 @@ export function ProductionPropsListsPage() {
     []
   );
   const navigate = useNavigate();
-  const [propsLists, setPropsLists] = useState(samplePropsLists);
+  const [propsLists, setPropsLists] = useState([]);
   const [adding, setAdding] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   // Retrieve the names and IDs of prop lists belonging to this production
-  useEffect(() => fetchItems(`production/${productionID}/props-list`, setPropsLists), [submitted]);
+  useEffect(
+    () => fetchItems(`production/${productionID}/props-list`, setPropsLists),
+    [submitted]
+  );
   // useEffect(() => console.log(propsLists), [propsLists]); debug print.
   return (
     <>
@@ -30,9 +33,19 @@ export function ProductionPropsListsPage() {
       <Button variant="outlined" onClick={() => setAdding(!adding)}>
         {!adding ? "+ Add new props list" : "- Close"}
       </Button>
-      {adding && <PropsListForm productionID={productionID} setSubmitted={()=>setSubmitted(!submitted)} />}
+      {adding && (
+        <PropsListForm
+          productionID={productionID}
+          onSubmit={() => {
+            setSubmitted(true);
+            setAdding(false);
+          }}
+        />
+      )}
       {/* Display a list of props lists */}
-      <DeleteButton resource={'production/'+productionID} >Delete production </DeleteButton>
+      <DeleteButton resource={"production/" + productionID}>
+        Delete production{" "}
+      </DeleteButton>
       <List>
         {propsLists.map((propsListDetails) => {
           const id = propsListDetails.propslistid;
@@ -49,7 +62,7 @@ export function ProductionPropsListsPage() {
   );
 }
 
-function PropsListForm({ productionID, setSubmitted }) {
+function PropsListForm({ productionID, onSubmit }) {
   const [formData, setFormData] = useState({
     // isCostumeList: false,
   });
@@ -69,12 +82,15 @@ function PropsListForm({ productionID, setSubmitted }) {
         onChange={(e) => handleChange(e)}
       />
       <Button
-        onClick={(e) =>
-          {
-            handleFormSubmit(e, `production/${productionID}/props-list`, formData)
-            setSubmitted();
-          }
-        }
+        onClick={(e) => {
+          handleFormSubmit(
+            e,
+            `production/${productionID}/props-list`,
+            formData
+          );
+          onSubmit();
+          console.log("workign");
+        }}
         variant="contained"
       >
         Submit

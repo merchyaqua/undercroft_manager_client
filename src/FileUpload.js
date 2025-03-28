@@ -21,8 +21,8 @@ export default function FileUpload({ setFile }) {
   // URL for display on the webpage
   const [url, setUrl] = useState(null);
   return (
-    <>
-      <img src={url} style={{ width: "400px" }} />
+    <div style={{ padding: "10px" }}>
+      <img src={url} style={{ width: "80%", height: "50%", maxWidth:"500px" }} />
       <Button
         component="label"
         role={undefined}
@@ -30,7 +30,7 @@ export default function FileUpload({ setFile }) {
         tabIndex={-1}
         startIcon={<CloudUploadIcon />}
       >
-        Upload files
+        Upload photo
         <VisuallyHiddenInput
           type="file"
           accept="image/*"
@@ -40,6 +40,6 @@ export default function FileUpload({ setFile }) {
           }}
         />
       </Button>
-    </>
+    </div>
   );
 }

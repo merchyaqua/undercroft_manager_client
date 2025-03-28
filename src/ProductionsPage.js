@@ -23,7 +23,7 @@ export default function ProductionsPage({}) {
   const navigate = useNavigate();
   const [adding, setAdding] = useState(false);
 
-  const [productions, setProductions] = useState(sampleProductions);
+  const [productions, setProductions] = useState([]);
   useEffect(() => fetchItems("production", setProductions), [adding]);
   // console.log(productions);
 

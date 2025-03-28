@@ -3,44 +3,41 @@ import { RichTreeView } from "@mui/x-tree-view";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DetailsForm } from "./PropsAddPage";
-import { sampleProps } from "./testData";
 
 import { Box, Button, Card, Typography } from "@mui/material";
+import DeleteButton from "./DeleteButton";
 import { fetchItems, submitData } from "./fetchItems";
 import { fetchOptionsTree } from "./helpers";
-import DeleteButton from "./DeleteButton";
 
 export default function PropDetailsPage() {
   const [propItem, setPropItem] = useState(null);
   const [editing, setEditing] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
   const { propID } = useParams();
-  function handleSaveDetails() {
-    sub
-  }
   // Fetching data for this prop
-  useEffect(() => fetchItems("prop/" + propID, setPropItem), []);
+  useEffect(() => fetchItems("prop/" + propID, setPropItem), [submitted]);
   console.log(propID);
 
-  return (
-    !propItem ? "Not found" :
+  return !propItem ? (
+    "Not found"
+  ) : (
     <>
       <div sx={{ display: "block", width: "100%" }}>
-        <Box sx={{ float: "right" }}>
-
-        <Button variant="outlined">
-          ⭐Star
-        </Button>
-        <DeleteButton resource={'prop/'+propID} navigate={navigate}>Delete prop</DeleteButton>
+        <Box sx={{ float: "right",display:"grid" }}>
+          {/* <Button variant="outlined">⭐Star</Button> */}
+          <DeleteButton resource={"prop/" + propID} navigate={navigate}>
+            Delete prop
+          </DeleteButton>
         </Box>
       </div>
-      <Box sx={{ display: "grid", marginLeft: "10px"}}>
+      <Box sx={{ display: "grid", marginLeft: "10px", minWidth:"350px"}}>
         <Box>
-          <Box sx={{ display: "inline-block", width: "50%" }}>
-            <img src={propItem.photopath} style={{ maxWidth: "100%" }} />
-            <Button variant="contained" sx={{ width: "100%" }}>
+          <Box sx={{ display: "inline-block"}}>
+            <img src={propItem.photopath} style={{ width:"50%", minWidth:"300px"}} />
+            {/* <Button variant="contained" sx={{ width: "100%" }}>
               View use history
-            </Button>
+            </Button> */}
           </Box>
           {editing ? (
             <>
@@ -52,14 +49,13 @@ export default function PropDetailsPage() {
               >
                 ❌
               </Button>
-              <Button
-                variant="contained"
-                sx={{ width: "10px" }}
-                onClick={handleSaveDetails}
-              >
-                Save
-              </Button>
-              <EditDetailsForm defaultFormData={propItem} />
+              <EditDetailsForm
+                defaultFormData={propItem}
+                onEdited={() => {
+                  setEditing(false);
+                  setSubmitted(!submitted);
+                }}
+              />
             </>
           ) : (
             <>
@@ -68,7 +64,9 @@ export default function PropDetailsPage() {
               <Button
                 variant="contained"
                 sx={{ width: "10px" }}
-                onClick={() => setEditing(true)}
+                onClick={() => {
+                  setEditing(true);
+                }}
               >
                 Edit
               </Button>
@@ -82,7 +80,7 @@ export default function PropDetailsPage() {
 
 function Details({ propItem }) {
   return (
-    <Box sx={{ display: "inline-block", width: "300px" }}>
+    <Box sx={{ display: "inline-block", width: "50%", minWidth: "300px" }}>
       <Card>
         <Typography variant="h2"> {propItem.propname}</Typography>
         {propItem.isbroken ? "Broken" : ""}
@@ -97,18 +95,18 @@ function Details({ propItem }) {
         </Typography>
       </Card>
       <span>
-        {propItem.available}
-        {
-          propItem.available === "In use" ?
-          "In use" : <LinkPropMenu propID={propItem.propid} /> 
+        
+        <div style={{display: (propItem.available === 0)&& "none"}}>
 
-        }
+        <LinkPropMenu propID={propItem.propid} />
+        </div>
+        {propItem.available === 0 ? "In use" : "Available"}
       </span>
     </Box>
   );
 }
 
-function EditDetailsForm({ defaultFormData }) {
+function EditDetailsForm({ defaultFormData, onEdited }) {
   const data = {
     name: defaultFormData.propname,
     photoPath: defaultFormData.photopath,
@@ -123,7 +121,13 @@ function EditDetailsForm({ defaultFormData }) {
   // we must do manual mapping before giving to form, which records details with capitalisation.
   // It also need to request to the update route instead of the POST route.
   // And the default selected.
-  return <DetailsForm defaultFormData={data} adding={false}/>;
+  return (
+    <DetailsForm
+      defaultFormData={data}
+      addingProp={false}
+      onEdited={onEdited}
+    />
+  );
 }
 
 function LinkPropMenu({ propID }) {
@@ -157,16 +161,20 @@ function LinkPropMenu({ propID }) {
 
   const [selectedItem, setSelectedItem] = useState(null);
   // Valid number means a propsListItem is selected and can be submitted to link
-  const canSubmit = !isNaN(selectedItem) && selectedItem ;
+  const canSubmit = !isNaN(selectedItem) && selectedItem;
 
   function handleSelectedItemChange(event, id) {
     setSelectedItem(id);
   }
   function handleSubmitLink() {
-    console.log(propID)
-    const res = submitData(`props-list-item/${selectedItem}/link`, {
-      propID: propID,
-    }, "PUT");
+    console.log(propID);
+    const res = submitData(
+      `props-list-item/${selectedItem}/link`,
+      {
+        propID: propID,
+      },
+      "PUT"
+    );
   }
   return (
     <Stack spacing={2}>
@@ -177,7 +185,9 @@ function LinkPropMenu({ propID }) {
           selectedItems={selectedItem}
           onSelectedItemsChange={handleSelectedItemChange}
         />
-        <Button disabled={!canSubmit} onClick={handleSubmitLink}>Link</Button>
+        <Button disabled={!canSubmit} onClick={handleSubmitLink}>
+          Link
+        </Button>
       </Box>
     </Stack>
   );

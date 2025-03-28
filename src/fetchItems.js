@@ -1,5 +1,5 @@
-export const tryurl = "https://silly-gabriela-undercroft-manager-245ea55f.koyeb.app/";
-// const tryurl = "http://127.0.0.1:5000/"
+// export const tryurl = "https://silly-gabriela-undercroft-manager-245ea55f.koyeb.app/";
+export const tryurl = "http://127.0.0.1:5000/"
 
 export function fetchItems(resource, setState) {
   // A general function to fetch data from servers and setting a state to the data.
@@ -26,7 +26,9 @@ export async function submitData(resource, formData, method = "POST") {
   const res = await fetch(tryurl + resource, {
     headers: {
       "Content-Type": "application/json",
-      // "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS"
+
     },
     method: method,
     body: JSON.stringify(formData),
@@ -69,6 +71,7 @@ export async function uploadToImgur(file, filename, title) {
     redirect: "follow",
   };
   try {
+    console.log("uploading to imgur");
     const res = await fetch("https://api.imgur.com/3/image", requestOptions);
     const result = await res.json();
 
