@@ -1,5 +1,5 @@
-// export const tryurl = "https://silly-gabriela-undercroft-manager-245ea55f.koyeb.app/";
-export const tryurl = "http://127.0.0.1:5000/"
+export const tryurl = "https://silly-gabriela-undercroft-manager-245ea55f.koyeb.app/";
+// export const tryurl = "http://127.0.0.1:5000/"
 
 export function fetchItems(resource, setState) {
   // A general function to fetch data from servers and setting a state to the data.
