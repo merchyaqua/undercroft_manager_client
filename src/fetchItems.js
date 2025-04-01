@@ -27,7 +27,7 @@ export async function submitData(resource, formData, method = "POST") {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS"
+      "Access-Control-Allow-Methods": "PUT, DELETE, POST, GET, OPTIONS"
 
     },
     method: method,

@@ -3,21 +3,19 @@ import {
   Box,
   Divider,
   FormControl,
-  ImageList,
+  Grid2,
   ImageListItem,
   ImageListItemBar,
   TextField,
   Typography,
-  Grid2,
-  Item
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
+import { tryurl } from "./fetchItems";
 import Loader from "./Loader";
 import { Sidebar } from "./Sidebar";
-import { sampleProps, sampleTags } from "./testData";
-import { tryurl } from "./fetchItems";
+import { sampleProps } from "./testData";
 const testing = false;
 
 export default function Main() {
@@ -94,7 +92,7 @@ export default function Main() {
             placeholder="Search for a prop"
           />
 
-          <TagsInput tagsData={sampleTags} />
+          {/* <TagsInput tagsData={sampleTags} /> */}
           <Divider />
           <Loader error={error} loading={loading}>
             <PropResults propResults={propResults} />
@@ -108,15 +106,18 @@ export default function Main() {
 function PropResults({ propResults }) {
   return (
     // <ImageList cols={3} gap={8} >
-    
-  <Grid2 container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+
+    <Grid2
+      container
+      spacing={{ xs: 2, md: 3 }}
+      columns={{ xs: 4, sm: 8, md: 12 }}
+    >
       {propResults.map((propResult) => (
-        
-    <Grid2 key={propResult.propid} size={{ xs: 2, sm: 4, md: 4 }}>
-      
-        <Prop key={propResult.propid} data={propResult} />
+        <Grid2 key={propResult.propid} size={{ xs: 2, sm: 4, md: 4 }}>
+          <Prop key={propResult.propid} data={propResult} />
+        </Grid2>
+      ))}
     </Grid2>
-      ))}</Grid2>
     // </ImageList>
   );
 }
@@ -134,12 +135,11 @@ function Prop({ data }) {
     isbroken: isbroken,
   } = data;
   const available = data.available === 1;
-  console.log(data.available)
-  const statusText = isbroken ? "BROKEN" : (available? "Available" : "In use")
-  const squareClass = isbroken ? "broken" : (!available && "in-use")
+  console.log(data.available);
+  const statusText = isbroken ? "BROKEN" : available ? "Available" : "In use";
+  const squareClass = isbroken ? "broken" : !available && "in-use";
   // console.log("here");
   return (
-    
     <ImageListItem className={"prop " + squareClass}>
       <img onClick={handleSelectProp} src={imgsrc} alt={name}></img>
       <ImageListItemBar
@@ -147,9 +147,8 @@ function Prop({ data }) {
         title={<Typography variant="h5">{name}</Typography>}
         subtitle={
           <span>
-            {data.available}
-            Location: {locname}
-            <br /> Status: {statusText}
+            <b>Location:</b> {locname}
+            <br /> <b>Status:</b> {statusText}
           </span>
         }
         position="below"

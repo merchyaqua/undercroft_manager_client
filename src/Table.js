@@ -3,13 +3,8 @@ import {
   Checkbox,
   InputLabel,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  ToggleButton,
+  Table,  TableBody,  TableCell,  TableHead,  TableRow,
+  TextField,  ToggleButton,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -133,16 +128,12 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
             <ToggleButton
               sx={{ "background-color": "Beige" }}
               onClick={handleEditButtonClicked}
-            >
-              ✏️
-            </ToggleButton>
+            >  ✏️</ToggleButton>
             <ToggleButton onClick={handleDeleteItem}>❌</ToggleButton>
             {emp.propid && (
               <>
                 <Button
-                  variant="outlined"
-                  sx={{ width: 0 }}
-                  onClick={handleViewLinkedProp}
+                  variant="outlined"  sx={{ width: 0 }} onClick={handleViewLinkedProp}
                 >
                   View Linked prop
                 </Button>

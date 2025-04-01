@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
 import { fetchItems } from "./fetchItems";
 import DataTable from "./Table";
-import { samplePropsListItems } from "./testData";
 
 export function PropsListPage() {
   const [propsListContent, setPropsListContent] = useState({
@@ -18,7 +17,6 @@ export function PropsListPage() {
 
   // Load propslistitems on first load of page, then whenever submitted is changed, reloads again.
   useEffect(() => {
-    console.log("fetched");
     fetchItems("props-list/" + propsListID, setPropsListContent);
   }, [submitted]);
   // With submitted in the dependency list, data is completely re-fetched once something gets submitted,
@@ -28,13 +26,11 @@ export function PropsListPage() {
     <>
       <DeleteButton
         resource={"props-list/" + propsListID}
-        setSubmitted={
-          () => {
-            // Redirect to production page after delete
-            const navigate = useNavigate();
-            navigate("production/"+productionID+"/props-lists")
-          }
-        }
+        setSubmitted={() => {
+          // Redirect to production page after delete
+          const navigate = useNavigate();
+          navigate("production/" + productionID + "/props-lists");
+        }}
       >
         Delete props list
       </DeleteButton>

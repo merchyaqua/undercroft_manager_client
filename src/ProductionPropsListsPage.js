@@ -1,31 +1,27 @@
 import { Box, Button, List, ListItemButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
 import { fetchItems, handleFormSubmit } from "./fetchItems";
-import { samplePropsLists } from "./testData";
+
 export function ProductionPropsListsPage() {
   // Extract productionID from URL
   const productionID = useParams()["productionID"];
   // Retrieve the name of the production once
   const [productionTitle, setProductionTitle] = useState("");
   useEffect(
-    () =>
-      fetchItems(`production/${productionID}`, (p) =>
+    () => fetchItems(`production/${productionID}`, (p) =>
         setProductionTitle(p.title)
       ),
     []
   );
-  const navigate = useNavigate();
   const [propsLists, setPropsLists] = useState([]);
   const [adding, setAdding] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   // Retrieve the names and IDs of prop lists belonging to this production
-  useEffect(
-    () => fetchItems(`production/${productionID}/props-list`, setPropsLists),
+  useEffect(() => fetchItems(`production/${productionID}/props-list`, setPropsLists),
     [submitted]
   );
-  // useEffect(() => console.log(propsLists), [propsLists]); debug print.
   return (
     <>
       <h2>Props Lists for {productionTitle}</h2>
@@ -71,7 +67,15 @@ function PropsListForm({ productionID, onSubmit }) {
     const value = e.target.value;
     setFormData((values) => ({ ...values, [name]: value }));
   }
-
+  function handleSubmitPropsList(e){
+      handleFormSubmit(
+        e,
+        `production/${productionID}/props-list`,
+        formData
+      );
+      onSubmit();
+      // console.log("workign");
+  }
   return (
     <Box centered display="inline-flex">
       <TextField
@@ -82,15 +86,7 @@ function PropsListForm({ productionID, onSubmit }) {
         onChange={(e) => handleChange(e)}
       />
       <Button
-        onClick={(e) => {
-          handleFormSubmit(
-            e,
-            `production/${productionID}/props-list`,
-            formData
-          );
-          onSubmit();
-          console.log("workign");
-        }}
+        onClick={handleSubmitPropsList}
         variant="contained"
       >
         Submit
