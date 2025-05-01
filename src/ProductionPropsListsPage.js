@@ -1,6 +1,6 @@
 import { Box, Button, List, ListItemButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
 import { fetchItems, handleFormSubmit } from "./fetchItems";
 
@@ -18,6 +18,7 @@ export function ProductionPropsListsPage() {
   const [propsLists, setPropsLists] = useState([]);
   const [adding, setAdding] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
   // Retrieve the names and IDs of prop lists belonging to this production
   useEffect(() => fetchItems(`production/${productionID}/props-list`, setPropsLists),
     [submitted]
@@ -39,8 +40,8 @@ export function ProductionPropsListsPage() {
         />
       )}
       {/* Display a list of props lists */}
-      <DeleteButton resource={"production/" + productionID}>
-        Delete production{" "}
+      <DeleteButton resource={"production/" + productionID} setSubmitted={() => navigate("/productions")}>
+        Delete production
       </DeleteButton>
       <List>
         {propsLists.map((propsListDetails) => {

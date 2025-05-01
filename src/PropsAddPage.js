@@ -296,7 +296,8 @@ function PropDetailsButtonGroup({
     <>
       {addingProp && (
         <span>
-          {/* All buttons will submit the data to the server. The third one resets the whole page. The second one will simply submit the data and do nothing.*/}
+          {/* All buttons will submit the data to the server. 
+          The third one resets the whole page. The second one will simply submit the data and do nothing.*/}
 
           <Button
             disabled={!canSubmit}

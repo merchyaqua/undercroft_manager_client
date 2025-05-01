@@ -92,7 +92,6 @@ function ProductionForm({ setAdding }) {
   return (
     <Box centered display="inline-flex">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        {/* <FormControl > */}
         <TextField
           name="title"
           label="Production Name"
@@ -121,8 +120,7 @@ function ProductionForm({ setAdding }) {
               lastShowDate: formData.lastShowDate.toISOString(),
             })
             setAdding(false)
-          }
-            
+            }
           }
           variant="contained"
         >

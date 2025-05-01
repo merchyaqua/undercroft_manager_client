@@ -46,7 +46,7 @@ export function DataTable({ title, data, setSubmitted, propsListID }) {
         <TableBody>
           <PropsListTableRowForm
             setSubmitted={setSubmitted}
-            emp={form}
+            propsListItem={form}
             // Empty function, since the page would reload anyway and return to a fresh state
             setEditing={() => setForm(initialNewRow)}
             headers={headers}
@@ -54,9 +54,9 @@ export function DataTable({ title, data, setSubmitted, propsListID }) {
             propsListID={propsListID}
           />
 
-          {data.map((emp, index) => (
+          {data.map((propsListItem, index) => (
             <PropsListTableRow
-              emp={emp}
+              propsListItem={propsListItem}
               headers={headers}
               key={index}
               setSubmitted={setSubmitted}
@@ -68,14 +68,14 @@ export function DataTable({ title, data, setSubmitted, propsListID }) {
   );
 }
 
-function PropsListTableRow({ emp, headers, setSubmitted }) {
-  // emp here is the propsListItem Object itself.
+function PropsListTableRow({ propsListItem, headers, setSubmitted }) {
+  // propsListItem here is the propsListItem Object itself.
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
   // Determine whether a prop is done
-  const done = emp.sourcestatus === "Done";
+  const done = propsListItem.sourcestatus === "Done";
   const [propDone, setPropDone] = useState(done);
-  useEffect(() => setPropDone(emp.sourcestatus === "Done"), [emp]);
+  useEffect(() => setPropDone(propsListItem.sourcestatus === "Done"), [propsListItem]);
   useEffect(() => setSubmitted(false)); // on getting the component mounted, set not submitted
 
   function handleEditButtonClicked() {
@@ -84,29 +84,30 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
   function handleToggleDone(e) {
     // Action is set to 'Done' and submitted to the PUT method.
     // setPropDone(!propDone);
-    const newData = { ...emp, sourceStatus: !propDone ? "Done" : "Todo" };
-    submitData("props-list-item/" + emp.propslistitemid, newData, "PUT");
+    const newData = { ...propsListItem, sourceStatus: !propDone ? "Done" : "Todo" };
+    submitData("props-list-item/" + propsListItem.propslistitemid, newData, "PUT");
     setSubmitted(true);
   }
   function handleDeleteItem(e) {
-    submitData("props-list-item/" + emp.propslistitemid, null, "DELETE");
+    submitData("props-list-item/" + propsListItem.propslistitemid, null, "DELETE");
     setSubmitted(true);
   }
   function handleViewLinkedProp(e) {
-    // Access the linked propID in the emp
-    const propID = emp.propid;
+    // Access the linked propID in the propsListItem
+    const propID = propsListItem.propid;
     // Redirect to corresponding prop page
     navigate("/prop/" + propID);
   }
   function handleUnlinkProp(e){
     // link it to null to unlink
-    submitData("props-list-item/link", {propsListItemID: null}, "PUT");
+    submitData(`props-list-item/${propsListItem.propslistitemid}/link`, {propID: null}, "PUT");
+    setSubmitted(true);
   }
   return (
     <>
       {editing ? (
         <PropsListTableRowForm
-          emp={emp}
+          propsListItem={propsListItem}
           headers={headers}
           add={false}
           setEditing={setEditing}
@@ -114,7 +115,7 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
         />
       ) : (
         <TableRow
-          key={emp.propslistitemid}
+          key={propsListItem.propslistitemid}
           sx={propDone && { backgroundColor: "#efffef" }}
         >
           <TableCell>
@@ -130,7 +131,7 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
               onClick={handleEditButtonClicked}
             >  ✏️</ToggleButton>
             <ToggleButton onClick={handleDeleteItem}>❌</ToggleButton>
-            {emp.propid && (
+            {propsListItem.propid && (
               <>
                 <Button
                   variant="outlined"  sx={{ width: 0 }} onClick={handleViewLinkedProp}
@@ -144,7 +145,7 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
           {/* Access each field of the object */}
           {headers.map((header) => (
             <TableCell align="right" key={header}>
-              {emp[header]}
+              {propsListItem[header]}
             </TableCell>
           ))}
         </TableRow>
@@ -154,14 +155,14 @@ function PropsListTableRow({ emp, headers, setSubmitted }) {
 }
 
 function PropsListTableRowForm({
-  emp,
+  propsListItem,
   headers,
   setSubmitted,
   setEditing,
   add,
   propsListID,
 }) {
-  const initialData = { ...emp, sourceStatus: emp.sourcestatus };
+  const initialData = { ...propsListItem, sourceStatus: propsListItem.sourcestatus };
   const [formData, setFormData] = useState(initialData);
   const canSubmit = formData.name !== "";
   const propDone = formData.status === "Done";
@@ -190,7 +191,7 @@ function PropsListTableRowForm({
     setEditing(false);
   }
   return (
-    <TableRow key={emp} sx={propDone && { backgroundColor: "#efffef" }}>
+    <TableRow key={propsListItem} sx={propDone && { backgroundColor: "#efffef" }}>
       <TableCell>
         <Button onClick={handleSubmit} disabled={!canSubmit}>
           {add ? "+ ADD" : "SAVE"}

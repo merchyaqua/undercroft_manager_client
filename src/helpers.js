@@ -49,7 +49,8 @@ export async function fetchOptionsTree() {
         label: dataItem.name,
       }
     }
-    // When the node is not a propsListItem, the ID should not be valid for the linking. This will be how the form rejects item being selected. It's weird using MUI so potentially using custom List tree would work.
+    // When the node is not a propsListItem, the ID should not be valid for the linking. 
+    // This will be how the form rejects item being selected. It's weird using MUI so potentially using custom List tree would work.
     let node = {
       id: (dataItem.name || dataItem.title || dataItem.propslisttitle) + itemID,
       label: dataItem.name || dataItem.title || dataItem.propslisttitle,
